@@ -6,8 +6,8 @@ import java.util.List;
 public class UrlIssue extends Issue {
     private final String url;
 
-    public UrlIssue(String title, IssueState state, String url) {
-        super(title, state, List.of());
+    public UrlIssue(String key, String summary, IssueState state, String url) {
+        super(key, summary, state, List.of());
         this.url = url;
     }
 
