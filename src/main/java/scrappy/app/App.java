@@ -2,8 +2,11 @@
 package scrappy.app;
 
 import scrappy.core.issuetypes.ExecutionIssue;
-import scrappy.jira.JiraApi;
 import scrappy.jira.JiraApiProps;
+import scrappy.jira.JiraIssues;
+import scrappy.web.ScrappyPage;
+
+import java.io.IOException;
 
 public class App {
     public static String location = "artifacts/";
@@ -15,12 +18,17 @@ public class App {
         String executionJira = args[3];
         JiraApiProps api = new JiraApiProps(apiUrl, login, apiToken);
 
-        JiraApi jiraApi = new JiraApi();
-        ExecutionIssue exe = jiraApi.getJiraExecutionTree(api, executionJira);
-        System.out.println(exe.getKey());
-        System.out.println(exe.getState());
-//        ScrappyPage page = new ScrappyPage();
-//        PageCollector collector = new PageCollector();
-//        collector.CapturePages(page, exe, location);
+        ExecutionIssue exe = null;
+        try {
+            exe = JiraIssues.getExecution(api, executionJira);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        ScrappyPage page = new ScrappyPage();
+        PageCollector collector = new PageCollector();
+        collector.CapturePages(page, exe, location);
     }
 }
