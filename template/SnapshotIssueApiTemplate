@@ -13,5 +13,21 @@
         "issuetype": {
           "name": "Scrappy Snapshot"
        }
+   },
+   "update":{
+      "issuelinks":[
+         {
+            "add":{
+               "type":{
+                  "name": "Snapshot",
+                  "inward": "is snapshot by",
+                  "outward": "snapshot of"
+               },
+               "outwardIssue":{
+                  "key": "%s"
+               }
+            }
+         }
+      ]
    }
 }

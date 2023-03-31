@@ -14,13 +14,12 @@ public class App {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         String apiUrl = args[0];
-        String login = args[1];
-        String apiToken = args[2];
-        String executionJira = args[3];
+        String project = args[1];
+        String login = args[2];
+        String apiToken = args[3];
+        String executionJira = args[4];
         JiraApiProps api = new JiraApiProps(apiUrl, login, apiToken);
 
-        System.out.println(JiraApi.createIssue(api));
-        /*
         ExecutionIssue exe = null;
         try {
             exe = JiraIssues.getExecution(api, executionJira);
@@ -29,6 +28,10 @@ public class App {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+        SnapshotSaver saver = new SnapshotSaver();
+        saver.SaveIssues(api, project, exe, location);
+        /*
 
         ScrappyPage page = new ScrappyPage();
         PageCollector collector = new PageCollector();
