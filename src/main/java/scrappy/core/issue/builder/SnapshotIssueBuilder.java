@@ -20,7 +20,6 @@ public class SnapshotIssueBuilder {
 
     private String projectKey = "";
     private String summary = "";
-    private String issueType = "";
 
     public SnapshotIssueBuilder setProject(String key) {
         this.projectKey = key;
@@ -32,13 +31,9 @@ public class SnapshotIssueBuilder {
         return this;
     }
 
-    public SnapshotIssueBuilder setIssueType(String issueType) {
-        this.issueType = issueType;
-        return this;
-    }
 
     @Override
     public String toString() {
-        return String.format(formatString, projectKey, summary, issueType);
+        return String.format(formatString, projectKey, summary);
     }
 }

@@ -37,7 +37,6 @@ public class JiraApi {
         String json = new SnapshotIssueBuilder()
             .setProject("STJ")
             .setSummary("Test Creation")
-            .setIssueType("Task")
             .toString();
 
         HttpRequest request = createAuthenticatedRequestBuilder(api)
