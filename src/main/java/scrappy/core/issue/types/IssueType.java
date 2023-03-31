@@ -1,4 +1,4 @@
-package scrappy.core.issuetypes;
+package scrappy.core.issue.types;
 
 public enum IssueType {
     Execution,

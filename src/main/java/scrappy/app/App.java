@@ -1,7 +1,7 @@
 // src/main/java/scrappy/web/core/App.java
 package scrappy.app;
 
-import scrappy.core.issuetypes.ExecutionIssue;
+import scrappy.core.issue.types.ExecutionIssue;
 import scrappy.jira.JiraApiProps;
 import scrappy.jira.JiraIssues;
 import scrappy.web.ScrappyPage;

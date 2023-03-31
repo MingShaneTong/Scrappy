@@ -1,6 +1,6 @@
-package scrappy.core.issueparser;
+package scrappy.core.issue.parser;
 
-import scrappy.core.issuetypes.IssueState;
+import scrappy.core.issue.types.IssueState;
 
 public class IssueStateParser {
     public static IssueState tryParse(String state) {

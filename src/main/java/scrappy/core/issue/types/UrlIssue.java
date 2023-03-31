@@ -1,6 +1,5 @@
-package scrappy.core.issuetypes;
+package scrappy.core.issue.types;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UrlIssue extends Issue {

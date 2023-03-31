@@ -1,8 +1,8 @@
 package scrappy.app;
 
-import scrappy.core.issuetypes.Issue;
-import scrappy.core.issuetypes.IssueState;
-import scrappy.core.issuetypes.UrlIssue;
+import scrappy.core.issue.types.Issue;
+import scrappy.core.issue.types.IssueState;
+import scrappy.core.issue.types.UrlIssue;
 import scrappy.web.ScrappyPage;
 
 public class PageCollector {
