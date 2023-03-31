@@ -2,6 +2,7 @@
 package scrappy.app;
 
 import scrappy.core.issue.types.ExecutionIssue;
+import scrappy.jira.JiraApi;
 import scrappy.jira.JiraApiProps;
 import scrappy.jira.JiraIssues;
 import scrappy.web.ScrappyPage;
@@ -11,13 +12,15 @@ import java.io.IOException;
 public class App {
     public static String location = "artifacts/";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         String apiUrl = args[0];
         String login = args[1];
         String apiToken = args[2];
         String executionJira = args[3];
         JiraApiProps api = new JiraApiProps(apiUrl, login, apiToken);
 
+        System.out.println(JiraApi.createIssue(api));
+        /*
         ExecutionIssue exe = null;
         try {
             exe = JiraIssues.getExecution(api, executionJira);
@@ -29,6 +32,6 @@ public class App {
 
         ScrappyPage page = new ScrappyPage();
         PageCollector collector = new PageCollector();
-        collector.CapturePages(page, exe, location);
+        collector.CapturePages(page, exe, location);*/
     }
 }

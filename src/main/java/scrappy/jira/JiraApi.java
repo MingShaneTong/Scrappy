@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import scrappy.core.issue.builder.SnapshotIssueBuilder;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
@@ -32,16 +33,20 @@ public class JiraApi {
         return JsonParser.parseString(response.body()).getAsJsonObject();
     }
 
-    public static JsonObject createIssue(JiraApiProps api, String issueKey) throws IOException, InterruptedException {
-//        new GsonBuilder().create();
-//
-//        HttpRequest request = createAuthenticatedRequestBuilder(api)
-//            .uri(URI.create(api.apiUrl()))
-//            .header("Content-type", "application/json")
-//            .method("POST", HttpRequest.BodyPublishers.ofString())
-//            .build();
-//        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-//        return JsonParser.parseString(response.body()).getAsJsonObject();
-        return null;
+    public static JsonObject createIssue(JiraApiProps api) throws IOException, InterruptedException {
+        String json = new SnapshotIssueBuilder()
+            .setProject("STJ")
+            .setSummary("Test Creation")
+            .setIssueType("Task")
+            .toString();
+
+        HttpRequest request = createAuthenticatedRequestBuilder(api)
+            .uri(URI.create(api.apiUrl()))
+            .header("Content-type", "application/json")
+            .method("POST", HttpRequest.BodyPublishers.ofString(json))
+            .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(json);
+        return JsonParser.parseString(response.body()).getAsJsonObject();
     }
 }

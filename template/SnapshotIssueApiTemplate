@@ -1,0 +1,17 @@
+{
+    "fields": {
+       "project":
+       {
+          "key": "%s"
+       },
+       "summary": "%s",
+       "description": {
+          "type": "doc",
+          "version": 1,
+          "content": []
+        },
+        "issuetype": {
+          "name": "%s"
+       }
+   }
+}
