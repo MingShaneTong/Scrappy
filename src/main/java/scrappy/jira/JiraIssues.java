@@ -1,53 +1,54 @@
 package scrappy.jira;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import scrappy.core.issue.parser.IssueStateParser;
 import scrappy.core.issue.parser.IssueTypeParser;
 import scrappy.core.issue.types.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class JiraIssues {
     private static final String CONTAINS = "Contains";
     private static final String URLFIELD = "customfield_10035";
 
-    public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) throws IOException, InterruptedException {
-        JsonObject json = JiraApi.getIssue(api, issueKey);
-        JsonObject fields = json.getAsJsonObject("fields");
+    public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) throws UnirestException {
+        JSONObject json = JiraApi.getIssue(api, issueKey);
+        JSONObject fields = json.getJSONObject("fields");
         String issueTypeString = fields
-            .getAsJsonObject("issuetype")
-            .get("name").getAsString();
+            .getJSONObject("issuetype")
+            .getString("name");
         IssueType type = IssueTypeParser.tryParse(issueTypeString);
         if (type != IssueType.Execution) {
             throw new RuntimeException("Parsing wrong issue type");
         }
 
         // collect field
-        String summary = fields.get("summary").getAsString();
+        String summary = fields.getString("summary");
         String stateString = fields
-            .getAsJsonObject("status")
-            .get("name").getAsString();
+            .getJSONObject("status")
+            .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
 
         // get issue links
-        JsonArray issuelinks = fields.get("issuelinks").getAsJsonArray();
-        List<Issue> subIssues = issuelinks.asList().stream()
-            .map(JsonElement::getAsJsonObject)
+        JSONArray issuelinks = fields.getJSONArray("issuelinks");
+        List<Issue> subIssues = IntStream
+            .range(0, issuelinks.length())
+            .mapToObj(i -> issuelinks.getJSONObject(i))
             .filter(linkObject -> {
-                String linkType = linkObject.getAsJsonObject("type")
-                    .get("name").getAsString();
+                String linkType = linkObject.getJSONObject("type")
+                    .getString("name");
                 return Objects.equals(linkType, CONTAINS);
             }).map(subIssue -> {
-                String subIssueKey = subIssue.getAsJsonObject("outwardIssue")
-                    .get("key").getAsString();
+                String subIssueKey = subIssue.getJSONObject("outwardIssue")
+                    .getString("key");
                 try {
                     return JiraIssues.getSubIssue(api, subIssueKey);
-                } catch (IOException | InterruptedException e) {
+                } catch (UnirestException e) {
                     throw new RuntimeException(e);
                 }
             })
@@ -56,12 +57,12 @@ public class JiraIssues {
         return new ExecutionIssue(issueKey, summary, state, subIssues);
     }
 
-    public static Issue getSubIssue(JiraApiProps api, String issueKey) throws IOException, InterruptedException {
-        JsonObject json = JiraApi.getIssue(api, issueKey);
-        JsonObject fields = json.getAsJsonObject("fields");
+    public static Issue getSubIssue(JiraApiProps api, String issueKey) throws UnirestException {
+        JSONObject json = JiraApi.getIssue(api, issueKey);
+        JSONObject fields = json.getJSONObject("fields");
         String issueTypeString = fields
-            .getAsJsonObject("issuetype")
-            .get("name").getAsString();
+            .getJSONObject("issuetype")
+            .getString("name");
         IssueType type = IssueTypeParser.tryParse(issueTypeString);
         switch (type) {
             case Folder:
@@ -74,30 +75,31 @@ public class JiraIssues {
         }
     }
 
-    private static FolderIssue getFolderIssue(JsonObject json, JiraApiProps api, String issueKey) {
+    private static FolderIssue getFolderIssue(JSONObject json, JiraApiProps api, String issueKey) {
         // collect field
-        JsonObject fields = json.getAsJsonObject("fields");
-        String summary = fields.get("summary").getAsString();
+        JSONObject fields = json.getJSONObject("fields");
+        String summary = fields.getString("summary");
         String stateString = fields
-            .getAsJsonObject("status")
-            .get("name").getAsString();
+            .getJSONObject("status")
+            .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
 
         // get issue links
-        JsonArray issuelinks = fields.get("issuelinks").getAsJsonArray();
-        List<Issue> subIssues = issuelinks.asList().stream()
-            .map(JsonElement::getAsJsonObject)
+        JSONArray issuelinks = fields.getJSONArray("issuelinks");
+        List<Issue> subIssues = IntStream
+            .range(0, issuelinks.length())
+            .mapToObj(i -> issuelinks.getJSONObject(i))
             .filter(linkObject -> {
-                String linkType = linkObject.getAsJsonObject("type")
-                    .get("name").getAsString();
+                String linkType = linkObject.getJSONObject("type")
+                    .getString("name");
                 boolean outwards = linkObject.has("outwardIssue");
                 return Objects.equals(linkType, CONTAINS) && outwards;
             }).map(subIssue -> {
-                String subIssueKey = subIssue.getAsJsonObject("outwardIssue")
-                    .get("key").getAsString();
+                String subIssueKey = subIssue.getJSONObject("outwardIssue")
+                    .getString("key");
                 try {
                     return JiraIssues.getSubIssue(api, subIssueKey);
-                } catch (IOException | InterruptedException e) {
+                } catch (UnirestException e) {
                     throw new RuntimeException(e);
                 }
             })
@@ -106,15 +108,15 @@ public class JiraIssues {
         return new FolderIssue(issueKey, summary, state, subIssues);
     }
 
-    private static UrlIssue getUrlIssue(JsonObject json, JiraApiProps api, String issueKey) {
+    private static UrlIssue getUrlIssue(JSONObject json, JiraApiProps api, String issueKey) {
         // collect field
-        JsonObject fields = json.getAsJsonObject("fields");
-        String summary = fields.get("summary").getAsString();
+        JSONObject fields = json.getJSONObject("fields");
+        String summary = fields.getString("summary");
         String stateString = fields
-            .getAsJsonObject("status")
-            .get("name").getAsString();
+            .getJSONObject("status")
+            .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
-        String url = fields.get(URLFIELD).getAsString();
+        String url = fields.getString(URLFIELD);
 
         return new UrlIssue(issueKey, summary, state, url);
     }
