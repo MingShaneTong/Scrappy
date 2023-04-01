@@ -16,7 +16,13 @@ public class JiraIssues {
     private static final String CONTAINS = "Contains";
     private static final String URLFIELD = "customfield_10035";
 
-    public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) throws UnirestException {
+    /**
+     * Returns Execution issue and its sub-issues.
+     * @param api
+     * @param issueKey
+     * @return
+     */
+    public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) {
         JSONObject json = JiraApi.getIssue(api, issueKey);
         JSONObject fields = json.getJSONObject("fields");
         String issueTypeString = fields
@@ -46,18 +52,20 @@ public class JiraIssues {
             }).map(subIssue -> {
                 String subIssueKey = subIssue.getJSONObject("outwardIssue")
                     .getString("key");
-                try {
-                    return JiraIssues.getSubIssue(api, subIssueKey);
-                } catch (UnirestException e) {
-                    throw new RuntimeException(e);
-                }
+                return JiraIssues.getSubIssue(api, subIssueKey);
             })
             .collect(Collectors.toList());
 
         return new ExecutionIssue(issueKey, summary, state, subIssues);
     }
 
-    public static Issue getSubIssue(JiraApiProps api, String issueKey) throws UnirestException {
+    /**
+     * Returns folder or url issue
+     * @param api
+     * @param issueKey
+     * @return
+     */
+    public static Issue getSubIssue(JiraApiProps api, String issueKey) {
         JSONObject json = JiraApi.getIssue(api, issueKey);
         JSONObject fields = json.getJSONObject("fields");
         String issueTypeString = fields
@@ -75,6 +83,13 @@ public class JiraIssues {
         }
     }
 
+    /**
+     * Returns folder issue and its sub-issues.
+     * @param json
+     * @param api
+     * @param issueKey
+     * @return
+     */
     private static FolderIssue getFolderIssue(JSONObject json, JiraApiProps api, String issueKey) {
         // collect field
         JSONObject fields = json.getJSONObject("fields");
@@ -97,17 +112,20 @@ public class JiraIssues {
             }).map(subIssue -> {
                 String subIssueKey = subIssue.getJSONObject("outwardIssue")
                     .getString("key");
-                try {
-                    return JiraIssues.getSubIssue(api, subIssueKey);
-                } catch (UnirestException e) {
-                    throw new RuntimeException(e);
-                }
+                return JiraIssues.getSubIssue(api, subIssueKey);
             })
             .collect(Collectors.toList());
 
         return new FolderIssue(issueKey, summary, state, subIssues);
     }
 
+    /**
+     * Returns Url issue.
+     * @param json
+     * @param api
+     * @param issueKey
+     * @return
+     */
     private static UrlIssue getUrlIssue(JSONObject json, JiraApiProps api, String issueKey) {
         // collect field
         JSONObject fields = json.getJSONObject("fields");

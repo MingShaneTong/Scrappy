@@ -5,7 +5,16 @@ import scrappy.core.issue.types.IssueState;
 import scrappy.core.issue.types.UrlIssue;
 import scrappy.web.ScrappyPage;
 
+/**
+ * Collects data from the webpages
+ */
 public class PageCollector {
+    /**
+     * Captures the webpage data and saves to the given location
+     * @param page
+     * @param issue
+     * @param location
+     */
     public void CapturePages(ScrappyPage page, Issue issue, String location) {
         if (issue.getState() != IssueState.InUse) { return; }
 

@@ -1,6 +1,5 @@
 package scrappy.app;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONObject;
 import scrappy.core.issue.builder.SnapshotIssueBuilder;
 import scrappy.core.issue.types.Issue;
@@ -13,8 +12,19 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Saves snapshots to Jira using the REST API
+ */
 public class SnapshotSaver {
     private static final DateTimeFormatter TIMEFORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+
+    /**
+     * Create tickets for the snapshot that was captured for a run
+     * @param api
+     * @param project
+     * @param issue
+     * @param location
+     */
     public void SaveIssues(JiraApiProps api, String project, Issue issue, String location) {
         if (issue.getState() != IssueState.InUse) { return; }
 
@@ -28,6 +38,13 @@ public class SnapshotSaver {
         }
     }
 
+    /**
+     * Creates a Snapshot Issue and add attachment files in folder to it.
+     * @param api
+     * @param project
+     * @param issue
+     * @param folder
+     */
     public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder) {
         String url = issue.getUrl();
         String time = TIMEFORMATTER.format(LocalDateTime.now());
@@ -38,15 +55,12 @@ public class SnapshotSaver {
             .setSummary(summary)
             .setIssueLink(issue.getKey())
             .toString();
-        try {
-            JSONObject newIssue = JiraApi.createIssue(api, json);
-            String issueKey = newIssue.getString("key");
 
-            for (File attachment : new File(folder).listFiles()) {
-                JiraApi.createAttachment(api, issueKey, attachment);
-            }
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
+        JSONObject newIssue = JiraApi.createIssue(api, json);
+        String issueKey = newIssue.getString("key");
+
+        for (File attachment : new File(folder).listFiles()) {
+            JiraApi.createAttachment(api, issueKey, attachment);
         }
     }
 }

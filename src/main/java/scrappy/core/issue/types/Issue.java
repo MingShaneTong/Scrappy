@@ -3,6 +3,9 @@ package scrappy.core.issue.types;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Generic Issue that could contain sub issues
+ */
 public abstract class Issue implements Iterable<Issue> {
     private final String key;
     private final String summary;
@@ -32,13 +35,26 @@ public abstract class Issue implements Iterable<Issue> {
         return !subIssues.isEmpty();
     }
 
+    /**
+     * Iterates through each of the sub issues.
+     * @return
+     */
     public Iterator<Issue> iterator() {
         return subIssues.iterator();
     }
 
+    /**
+     * Return issue tree string starting as the root.
+     * @return
+     */
     public String printTree() {
         return printTree(0, "");
     }
+
+    /**
+     * Returns issue tree continuing from depth 'tabs'.
+     * @return
+     */
     public String printTree(int tabs, String current) {
         String newStr = current;
         newStr += "\t".repeat(tabs);

@@ -2,6 +2,9 @@ package scrappy.core.issue.parser;
 
 import scrappy.core.issue.types.IssueState;
 
+/**
+ * Parses the issue state from a string
+ */
 public class IssueStateParser {
     public static IssueState tryParse(String state) {
         try {
