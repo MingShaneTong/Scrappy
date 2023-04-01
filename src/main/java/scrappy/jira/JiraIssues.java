@@ -1,6 +1,5 @@
 package scrappy.jira;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import scrappy.core.issue.parser.IssueStateParser;
@@ -11,10 +10,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class JiraIssues {
     private static final String CONTAINS = "Contains";
     private static final String URLFIELD = "customfield_10035";
+    private static final String INSTRUCTIONFIELD = "customfield_10036";
+
+    private static Stream<JSONObject> jsonArrayToStream(JSONArray array) {
+        return IntStream
+            .range(0, array.length())
+            .mapToObj(i -> array.getJSONObject(i));
+    }
 
     /**
      * Returns Execution issue and its sub-issues.
@@ -42,9 +49,7 @@ public class JiraIssues {
 
         // get issue links
         JSONArray issuelinks = fields.getJSONArray("issuelinks");
-        List<Issue> subIssues = IntStream
-            .range(0, issuelinks.length())
-            .mapToObj(i -> issuelinks.getJSONObject(i))
+        List<Issue> subIssues = jsonArrayToStream(issuelinks)
             .filter(linkObject -> {
                 String linkType = linkObject.getJSONObject("type")
                     .getString("name");
@@ -101,9 +106,7 @@ public class JiraIssues {
 
         // get issue links
         JSONArray issuelinks = fields.getJSONArray("issuelinks");
-        List<Issue> subIssues = IntStream
-            .range(0, issuelinks.length())
-            .mapToObj(i -> issuelinks.getJSONObject(i))
+        List<Issue> subIssues = jsonArrayToStream(issuelinks)
             .filter(linkObject -> {
                 String linkType = linkObject.getJSONObject("type")
                     .getString("name");
@@ -136,6 +139,18 @@ public class JiraIssues {
         IssueState state = IssueStateParser.tryParse(stateString);
         String url = fields.getString(URLFIELD);
 
-        return new UrlIssue(issueKey, summary, state, url);
+        String instructions = "";
+        if (fields.has(INSTRUCTIONFIELD) && fields.isNull(INSTRUCTIONFIELD) == false) {
+            JSONArray instructionsArray = fields
+                .getJSONObject(INSTRUCTIONFIELD)
+                .getJSONArray("content");
+            instructions = jsonArrayToStream(instructionsArray)
+                .filter(instrObj -> instrObj.getString("type").equals("paragraph"))
+                .flatMap(instrObj -> jsonArrayToStream(instrObj.getJSONArray("content")))
+                .filter(instrContent -> instrContent.getString("type").equals("text"))
+                .map(instrContent -> instrContent.getString("text"))
+                .reduce("", (a, b) -> a + b);
+        }
+        return new UrlIssue(issueKey, summary, state, instructions, url);
     }
 }
