@@ -1,7 +1,6 @@
 // src/main/java/scrappy/web/core/App.java
 package scrappy.app;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import scrappy.core.issue.types.ExecutionIssue;
 import scrappy.jira.JiraApiProps;
 import scrappy.jira.JiraIssues;
@@ -18,12 +17,7 @@ public class App {
         String executionJira = args[4];
         JiraApiProps api = new JiraApiProps(apiUrl, login, apiToken);
 
-        ExecutionIssue exe;
-        try {
-            exe = JiraIssues.getExecution(api, executionJira);
-        } catch (UnirestException e) {
-            throw new RuntimeException(e);
-        }
+        ExecutionIssue exe = JiraIssues.getExecution(api, executionJira);
 
         ScrappyPage page = new ScrappyPage();
         PageCollector collector = new PageCollector();

@@ -2,6 +2,9 @@ package scrappy.core.issue.types;
 
 import java.util.List;
 
+/**
+ * Contains Url to test
+ */
 public class UrlIssue extends Issue {
     private final String url;
 

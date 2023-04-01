@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Builds a Snapshot issue Json to be in the body of the REST API Request
+ */
 public class SnapshotIssueBuilder {
     private static String formatString;
 

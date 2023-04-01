@@ -8,31 +8,65 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+/**
+ * Creates Json Requests to perform actions and retrieve data,
+ */
 public class JiraApi {
-    public static JSONObject getIssue(JiraApiProps api, String issueKey) throws UnirestException {
+    /**
+     * Retrieves issue from Jira
+     * @param api
+     * @param issueKey
+     * @return Json body of the Jira Issue
+     */
+    public static JSONObject getIssue(JiraApiProps api, String issueKey) {
         String url = api.apiUrl() + issueKey;
-        HttpResponse<JsonNode> response = Unirest.get(url)
-            .basicAuth(api.login(), api.apiToken())
-            .asJson();
-        return response.getBody().getObject();
+        try {
+            HttpResponse<JsonNode> response = Unirest.get(url)
+                .basicAuth(api.login(), api.apiToken())
+                .asJson();
+            return response.getBody().getObject();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static JSONObject createIssue(JiraApiProps api, String issueJson) throws UnirestException {
-        HttpResponse<JsonNode> response = Unirest.post(api.apiUrl())
-            .basicAuth(api.login(), api.apiToken())
-            .header("Content-type", "application/json")
-            .body(issueJson)
-            .asJson();
-        return response.getBody().getObject();
+    /**
+     * Creates an issue with the provided json data
+     * @param api
+     * @param issueJson
+     * @return Json response from REST Api
+     */
+    public static JSONObject createIssue(JiraApiProps api, String issueJson) {
+        try {
+            HttpResponse<JsonNode> response = Unirest.post(api.apiUrl())
+                .basicAuth(api.login(), api.apiToken())
+                .header("Content-type", "application/json")
+                .body(issueJson)
+                .asJson();
+            return response.getBody().getObject();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static JSONObject createAttachment(JiraApiProps api, String issueKey, File file) throws UnirestException {
+    /**
+     * Attaches file to the Jira issue
+     * @param api
+     * @param issueKey
+     * @param file
+     * @return Json response from REST Api
+     */
+    public static JSONObject createAttachment(JiraApiProps api, String issueKey, File file) {
         String url = api.apiUrl() + issueKey + "/attachments";
-        HttpResponse<JsonNode> response = Unirest.post(url)
-            .basicAuth(api.login(), api.apiToken())
-            .header("X-Atlassian-Token", "no-check")
-            .field("file", file)
-            .asJson();
-        return response.getBody().getObject();
+        try {
+            HttpResponse<JsonNode> response = Unirest.post(url)
+                .basicAuth(api.login(), api.apiToken())
+                .header("X-Atlassian-Token", "no-check")
+                .field("file", file)
+                .asJson();
+            return response.getBody().getObject();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
