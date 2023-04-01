@@ -46,9 +46,8 @@ public class SnapshotSaver {
      * @param folder
      */
     public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder) {
-        String url = issue.getUrl();
         String time = TIMEFORMATTER.format(LocalDateTime.now());
-        String summary = String.format("%s %s", time, url);
+        String summary = String.format("%s %s", time, issue.getSummary());
 
         String json = new SnapshotIssueBuilder()
             .setProject(project)
