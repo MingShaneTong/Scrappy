@@ -1,6 +1,7 @@
 // src/main/java/scrappy/web/core/App.java
 package scrappy.app;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import scrappy.core.issue.types.ExecutionIssue;
 import scrappy.jira.JiraApi;
 import scrappy.jira.JiraApiProps;
@@ -8,6 +9,7 @@ import scrappy.jira.JiraIssues;
 import scrappy.web.ScrappyPage;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class App {
     public static String location = "artifacts/";
@@ -29,12 +31,11 @@ public class App {
             throw new RuntimeException(e);
         }
 
-        SnapshotSaver saver = new SnapshotSaver();
-        saver.SaveIssues(api, project, exe, location);
-        /*
-
         ScrappyPage page = new ScrappyPage();
         PageCollector collector = new PageCollector();
-        collector.CapturePages(page, exe, location);*/
+        collector.CapturePages(page, exe, location);
+
+        SnapshotSaver saver = new SnapshotSaver();
+        saver.SaveIssues(api, project, exe, location);
     }
 }

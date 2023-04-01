@@ -1,5 +1,7 @@
 package scrappy.app;
 
+import com.google.gson.JsonObject;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import scrappy.core.issue.builder.SnapshotIssueBuilder;
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;
@@ -7,6 +9,7 @@ import scrappy.core.issue.types.UrlIssue;
 import scrappy.jira.JiraApi;
 import scrappy.jira.JiraApiProps;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,11 +25,11 @@ public class SnapshotSaver {
                 SaveIssues(api, project, subIssue, nextLocation);
             }
         } else if(issue instanceof UrlIssue) {
-            SaveSnapshot(api, project, (UrlIssue) issue);
+            SaveSnapshot(api, project, (UrlIssue) issue, nextLocation);
         }
     }
 
-    public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue) {
+    public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder) {
         String url = issue.getUrl();
         String time = TIMEFORMATTER.format(LocalDateTime.now());
         String summary = String.format("%s %s", time, url);
@@ -37,10 +40,17 @@ public class SnapshotSaver {
             .setIssueLink(issue.getKey())
             .toString();
         try {
-            JiraApi.createIssue(api, json);
+            JsonObject newIssue = JiraApi.createIssue(api, json);
+            String issueKey = newIssue.get("key").getAsString();
+
+            for (File attachment : new File(folder).listFiles()) {
+                JiraApi.createAttachment(api, issueKey, attachment);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (UnirestException e) {
             throw new RuntimeException(e);
         }
     }
