@@ -1,56 +1,38 @@
 package scrappy.jira;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpClient;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.Base64;
 
 public class JiraApi {
-    public static HttpRequest.Builder createAuthenticatedRequestBuilder(JiraApiProps api) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        String auth  = api.login() + ":" + api.apiToken();
-        String encodedAuth = encoder.encodeToString(auth.getBytes());
-        return HttpRequest.newBuilder()
-            .header("Authorization", "Basic " + encodedAuth);
-    }
-
-    public static JsonObject getIssue(JiraApiProps api, String issueKey) throws IOException, InterruptedException {
+    public static JSONObject getIssue(JiraApiProps api, String issueKey) throws UnirestException {
         String url = api.apiUrl() + issueKey;
-
-        HttpRequest request = createAuthenticatedRequestBuilder(api)
-            .uri(URI.create(url))
-            .method("GET", HttpRequest.BodyPublishers.noBody())
-            .build();
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        return JsonParser.parseString(response.body()).getAsJsonObject();
-    }
-
-    public static JsonObject createIssue(JiraApiProps api, String issueJson) throws IOException, InterruptedException {
-        HttpRequest request = createAuthenticatedRequestBuilder(api)
-            .uri(URI.create(api.apiUrl()))
-            .header("Content-type", "application/json")
-            .method("POST", HttpRequest.BodyPublishers.ofString(issueJson))
-            .build();
-        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        return JsonParser.parseString(response.body()).getAsJsonObject();
-    }
-
-    public static void createAttachment(JiraApiProps api, String issueKey, File file) throws IOException, InterruptedException, UnirestException {
-        com.mashape.unirest.http.HttpResponse<String> response = Unirest.post(api.apiUrl() + issueKey + "/attachments")
+        HttpResponse<JsonNode> response = Unirest.get(url)
             .basicAuth(api.login(), api.apiToken())
-            .header("Accept", "application/json")
+            .asJson();
+        return response.getBody().getObject();
+    }
+
+    public static JSONObject createIssue(JiraApiProps api, String issueJson) throws UnirestException {
+        HttpResponse<JsonNode> response = Unirest.post(api.apiUrl())
+            .basicAuth(api.login(), api.apiToken())
+            .header("Content-type", "application/json")
+            .body(issueJson)
+            .asJson();
+        return response.getBody().getObject();
+    }
+
+    public static JSONObject createAttachment(JiraApiProps api, String issueKey, File file) throws UnirestException {
+        String url = api.apiUrl() + issueKey + "/attachments";
+        HttpResponse<JsonNode> response = Unirest.post(url)
+            .basicAuth(api.login(), api.apiToken())
             .header("X-Atlassian-Token", "no-check")
             .field("file", file)
-            .asString();
+            .asJson();
+        return response.getBody().getObject();
     }
 }

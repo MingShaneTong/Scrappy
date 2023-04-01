@@ -1,7 +1,7 @@
 package scrappy.app;
 
-import com.google.gson.JsonObject;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONObject;
 import scrappy.core.issue.builder.SnapshotIssueBuilder;
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;
@@ -10,7 +10,6 @@ import scrappy.jira.JiraApi;
 import scrappy.jira.JiraApiProps;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -40,16 +39,12 @@ public class SnapshotSaver {
             .setIssueLink(issue.getKey())
             .toString();
         try {
-            JsonObject newIssue = JiraApi.createIssue(api, json);
-            String issueKey = newIssue.get("key").getAsString();
+            JSONObject newIssue = JiraApi.createIssue(api, json);
+            String issueKey = newIssue.getString("key");
 
             for (File attachment : new File(folder).listFiles()) {
                 JiraApi.createAttachment(api, issueKey, attachment);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         } catch (UnirestException e) {
             throw new RuntimeException(e);
         }

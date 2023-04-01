@@ -4,7 +4,6 @@ import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 
-import java.io.Console;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
