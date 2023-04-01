@@ -3,9 +3,9 @@ package scrappy.jira;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import scrappy.core.issueparser.IssueStateParser;
-import scrappy.core.issueparser.IssueTypeParser;
-import scrappy.core.issuetypes.*;
+import scrappy.core.issue.parser.IssueStateParser;
+import scrappy.core.issue.parser.IssueTypeParser;
+import scrappy.core.issue.types.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class JiraIssues {
-    private static String CONTAINS = "Contains";
-    private static String URLFIELD = "customfield_10035";
+    private static final String CONTAINS = "Contains";
+    private static final String URLFIELD = "customfield_10035";
 
     public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) throws IOException, InterruptedException {
         JsonObject json = JiraApi.getIssue(api, issueKey);
@@ -47,16 +47,13 @@ public class JiraIssues {
                     .get("key").getAsString();
                 try {
                     return JiraIssues.getSubIssue(api, subIssueKey);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             })
             .collect(Collectors.toList());
 
-        ExecutionIssue issue = new ExecutionIssue(issueKey, summary, state, subIssues);
-        return issue;
+        return new ExecutionIssue(issueKey, summary, state, subIssues);
     }
 
     public static Issue getSubIssue(JiraApiProps api, String issueKey) throws IOException, InterruptedException {
@@ -100,16 +97,13 @@ public class JiraIssues {
                     .get("key").getAsString();
                 try {
                     return JiraIssues.getSubIssue(api, subIssueKey);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (InterruptedException e) {
+                } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             })
             .collect(Collectors.toList());
 
-        FolderIssue issue = new FolderIssue(issueKey, summary, state, subIssues);
-        return issue;
+        return new FolderIssue(issueKey, summary, state, subIssues);
     }
 
     private static UrlIssue getUrlIssue(JsonObject json, JiraApiProps api, String issueKey) {
@@ -122,7 +116,6 @@ public class JiraIssues {
         IssueState state = IssueStateParser.tryParse(stateString);
         String url = fields.get(URLFIELD).getAsString();
 
-        UrlIssue issue = new UrlIssue(issueKey, summary, state, url);
-        return issue;
+        return new UrlIssue(issueKey, summary, state, url);
     }
 }
