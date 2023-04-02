@@ -1,5 +1,6 @@
 package scrappy.web.instructions;
 
+import scrappy.web.instructions.nodes.CommentNode;
 import scrappy.web.instructions.nodes.IInstructionNode;
 import scrappy.web.instructions.parameters.Selector;
 
@@ -23,7 +24,8 @@ public class InstructionParser {
         throw new RuntimeException(msg + "...");
     }
 
-    public static final Pattern STMTPAT = Pattern.compile("Visit|Click|Wait|Screenshot|Capture|For Each");
+    public static final Pattern STMTPAT = Pattern.compile("//|Visit|Click|Wait|Screenshot|Capture|For Each");
+    public static final Pattern COMMENTPAT = Pattern.compile("//");
     public static final Pattern VISITPAT = Pattern.compile("Visit");
     public static final Pattern CLICKPAT = Pattern.compile("Click");
     public static final Pattern WAITPAT = Pattern.compile("Wait");
@@ -54,9 +56,11 @@ public class InstructionParser {
 
     public static IInstructionNode parseStmt(Scanner scanner) {
         IInstructionNode node = null;
-        if(scanner.hasNext(VISITPAT)) {
+        if (scanner.hasNext(COMMENTPAT)){
+            node = parseComment(scanner);
+        } else if (scanner.hasNext(VISITPAT)) {
             node = parseVisit(scanner);
-        } else if(scanner.hasNext(CLICKPAT)) {
+        } else if (scanner.hasNext(CLICKPAT)) {
             node = parseClick(scanner);
         } else if (scanner.hasNext(WAITPAT)) {
 
@@ -70,6 +74,15 @@ public class InstructionParser {
             fail("STMT not supported", scanner);
         }
         return node;
+    }
+
+    public static IInstructionNode parseComment(Scanner scanner) {
+        require(COMMENTPAT, "'//' is required", scanner);
+        while (scanner.hasNext(SEMICOLON) == false) {
+            scanner.next();
+        }
+        require(SEMICOLON, "';' is required", scanner);
+        return new CommentNode();
     }
 
     public static IInstructionNode parseVisit(Scanner scanner) {
