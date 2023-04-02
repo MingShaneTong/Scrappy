@@ -19,11 +19,11 @@ public class App {
 
         ExecutionIssue exe = JiraIssues.getExecution(api, executionJira);
 
-        ScrappyPage page = new ScrappyPage();
-        PageCollector collector = new PageCollector();
-        collector.CapturePages(page, exe, location);
-
-        SnapshotSaver saver = new SnapshotSaver();
-        saver.SaveIssues(api, project, exe, location);
+//        ScrappyPage page = new ScrappyPage();
+//        PageCollector collector = new PageCollector();
+//        collector.CapturePages(page, exe, location);
+//
+//        SnapshotSaver saver = new SnapshotSaver();
+//        saver.SaveIssues(api, project, exe, location);
     }
 }
