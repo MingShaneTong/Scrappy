@@ -23,7 +23,8 @@ public class InstructionParser {
         throw new RuntimeException(msg + "...");
     }
 
-    public static final Pattern PROGRAMPAT = Pattern.compile("Click|Wait|Screenshot|Capture|For Each");
+    public static final Pattern STMTPAT = Pattern.compile("Visit|Click|Wait|Screenshot|Capture|For Each");
+    public static final Pattern VISITPAT = Pattern.compile("Visit");
     public static final Pattern CLICKPAT = Pattern.compile("Click");
     public static final Pattern WAITPAT = Pattern.compile("Wait");
     public static final Pattern SCREENSHOTPAT = Pattern.compile("Screenshot");
@@ -45,7 +46,7 @@ public class InstructionParser {
     }
 
     public static IInstructionNode parseProgram(Scanner scanner) {
-        while (scanner.hasNext(PROGRAMPAT)) {
+        while (scanner.hasNext(STMTPAT)) {
             parseStmt(scanner);
         }
         return null;
@@ -53,7 +54,9 @@ public class InstructionParser {
 
     public static IInstructionNode parseStmt(Scanner scanner) {
         IInstructionNode node = null;
-        if(scanner.hasNext(CLICKPAT)) {
+        if(scanner.hasNext(VISITPAT)) {
+            node = parseVisit(scanner);
+        } else if(scanner.hasNext(CLICKPAT)) {
             node = parseClick(scanner);
         } else if (scanner.hasNext(WAITPAT)) {
 
@@ -67,6 +70,15 @@ public class InstructionParser {
             fail("STMT not supported", scanner);
         }
         return node;
+    }
+
+    public static IInstructionNode parseVisit(Scanner scanner) {
+        require(VISITPAT, "'Visit' is required", scanner);
+        require(OPENPAREN, "'(' is required", scanner);
+        String description = scanner.next();
+        require(CLOSEPAREN, "')' is required", scanner);
+        require(SEMICOLON, "';' is required", scanner);
+        return null;
     }
 
     public static IInstructionNode parseClick(Scanner scanner) {
