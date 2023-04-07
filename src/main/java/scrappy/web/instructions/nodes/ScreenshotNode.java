@@ -18,10 +18,11 @@ public class ScreenshotNode implements IInstructionNode {
 
     @Override
     public void apply(Page page, Variables var) {
+        String folder = var.get("location");
         page.locator(selector.getSelector())
             .screenshot(
                 new Locator.ScreenshotOptions()
-                    .setPath(Paths.get(file))
+                    .setPath(Paths.get(folder + file))
             );
     }
 }

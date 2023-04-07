@@ -5,10 +5,15 @@ import scrappy.core.issue.types.IssueState;
 import scrappy.core.issue.types.UrlIssue;
 import scrappy.web.ScrappyPage;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Collects data from the webpages
  */
-public class PageCollector {
+public class PageCapture {
     /**
      * Captures the webpage data and saves to the given location
      * @param page
@@ -18,13 +23,20 @@ public class PageCollector {
     public void CapturePages(ScrappyPage page, Issue issue, String location) {
         if (issue.getState() != IssueState.InUse) { return; }
 
-        String nextLocation = location + "/" + issue.getKey();
+        String nextLocation = location + issue.getKey() + "/";
         if (issue.hasSubIssues()) {
             for (Issue subIssue : issue) {
                 CapturePages(page, subIssue, nextLocation);
             }
         } else if(issue instanceof UrlIssue) {
-            page.VisitAndCaptureData(((UrlIssue) issue).getUrl(), nextLocation);
+            Path path = Paths.get(nextLocation);
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            UrlIssue urlIssue = (UrlIssue) issue;
+            page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), nextLocation);
         }
     }
 }

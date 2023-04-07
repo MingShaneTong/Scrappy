@@ -22,8 +22,10 @@ public class CaptureNode implements IInstructionNode {
 
     @Override
     public void apply(Page page, Variables var) {
+        String folder = var.get("location");
+
         Locator locator = page.locator(selector.getSelector());
-        try (FileWriter writer = new FileWriter(file)) {
+        try (FileWriter writer = new FileWriter(folder + file)) {
             switch (type) {
                 case HTML:
                     writer.append(locator.innerHTML());

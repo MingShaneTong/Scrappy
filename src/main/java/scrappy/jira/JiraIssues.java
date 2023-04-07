@@ -145,7 +145,7 @@ public class JiraIssues {
                 .getJSONObject(INSTRUCTIONFIELD)
                 .getJSONArray("content");
             instructions = jsonArrayToStream(instructionsArray)
-                .filter(instrObj -> instrObj.getString("type").equals("paragraph"))
+                .filter(instrObj -> instrObj.getString("type").equals("codeBlock"))
                 .flatMap(instrObj -> jsonArrayToStream(instrObj.getJSONArray("content")))
                 .filter(instrContent -> instrContent.getString("type").equals("text"))
                 .map(instrContent -> instrContent.getString("text"))
