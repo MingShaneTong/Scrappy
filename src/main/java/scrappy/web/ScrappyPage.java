@@ -3,67 +3,43 @@ package scrappy.web;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Paths;
+import scrappy.web.instructions.InstructionParser;
+import scrappy.web.instructions.Variables;
+import scrappy.web.instructions.nodes.IInstructionNode;
 
 /**
  * Scraps data from the webpage
  */
 public class ScrappyPage {
+    private IInstructionNode defaultInstruction;
+
+    public ScrappyPage() {
+        defaultInstruction = InstructionParser.parseFile("default.instruction");
+    }
+
     /**
-     * Visits the url and captures screenshot, HTML and text content
-     * and saves to location
+     * Captures data based on instructions
      * @param url
+     * @param instructions
      * @param location
      */
-    public void VisitAndCaptureData(String url, String location) {
+    public void capture(String url, String instructions, String location) {
         try (Playwright playwright = Playwright.create()) {
-            Browser browser = playwright.chromium().launch();
-            Page page = browser.newPage();
-            page.navigate(url);
+            try (Browser browser = playwright.chromium().launch()) {
+                Page page = browser.newPage();
 
-            CaptureScreenshot(location + "/screenshot.png", page);
-            CaptureHTML(location + "/page.html", page);
-            CaptureTextContent(location + "/content.txt", page);
-        }
-    }
+                Variables var = new Variables();
+                var.put("url", url);
+                var.put("location", location);
 
-    /**
-     * Captures a screenshot of the page and saves to location
-     * @param location
-     * @param page
-     */
-    private void CaptureScreenshot(String location, Page page) {
-        page.screenshot(new Page.ScreenshotOptions()
-            .setPath(Paths.get(location))
-            .setFullPage(true));
-    }
-
-    /**
-     * Captures HTML of the page and saves to location
-     * @param location
-     * @param page
-     */
-    private void CaptureHTML(String location, Page page) {
-        try (FileWriter writer = new FileWriter(location)) {
-            writer.write(page.content());
-        } catch (IOException e) {
-            System.out.println("Capture HTML failed: " + page.url());
-        }
-    }
-
-    /**
-     * Captures text of the page and saves to location
-     * @param location
-     * @param page
-     */
-    private void CaptureTextContent(String location, Page page) {
-        try (FileWriter writer = new FileWriter(location)) {
-            writer.write(page.textContent("body"));
-        } catch (IOException e) {
-            System.out.println("Capture HTML failed: " + page.url());
+                IInstructionNode instruct;
+                if (instructions == null || instructions.isBlank()) {
+                    instruct = defaultInstruction;
+                } else {
+                    instruct = InstructionParser.parse(instructions);
+                }
+                instruct.apply(page, var);
+            }
         }
     }
 }
