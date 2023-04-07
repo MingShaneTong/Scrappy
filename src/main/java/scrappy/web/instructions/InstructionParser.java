@@ -1,8 +1,6 @@
 package scrappy.web.instructions;
 
-import scrappy.web.instructions.nodes.CommentNode;
-import scrappy.web.instructions.nodes.IInstructionNode;
-import scrappy.web.instructions.nodes.WaitForNode;
+import scrappy.web.instructions.nodes.*;
 import scrappy.web.instructions.parameters.Selector;
 
 import java.util.Scanner;
@@ -38,8 +36,10 @@ public class InstructionParser {
     public static final Pattern CLOSEPAREN = Pattern.compile("\\)");
 
     public static final Pattern WITH = Pattern.compile("with");
-    public static final Pattern SELECTOR = Pattern.compile("selector");
-    public static final Pattern SEMICOLON = Pattern.compile(";");
+    public static final Pattern AS = Pattern.compile("as");
+    public static final Pattern FILE = Pattern.compile("file");
+
+    public static final Pattern SELECTOR = Pattern.compile("selector");    public static final Pattern SEMICOLON = Pattern.compile(";");
 
     public static IInstructionNode parse(String instructions) {
         Scanner scanner = new Scanner(instructions).useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
@@ -66,7 +66,7 @@ public class InstructionParser {
         } else if (scanner.hasNext(WAITFORPAT)) {
             node = parseWaitFor(scanner);
         } else if (scanner.hasNext(SCREENSHOTPAT)) {
-
+            node = parseScreenshot(scanner);
         } else if (scanner.hasNext(CAPTUREPAT)) {
 
         } else if (scanner.hasNext(FOREACHPAT)) {
@@ -92,37 +92,47 @@ public class InstructionParser {
         String description = scanner.next();
         require(CLOSEPAREN, "')' is required", scanner);
         require(SEMICOLON, "';' is required", scanner);
-        return null;
+        return new VisitNode(description);
     }
 
     public static IInstructionNode parseClick(Scanner scanner) {
         require(CLICKPAT, "'Click' is required", scanner);
         Selector selector = parseSelector(scanner);
-        return null;
+        require(SEMICOLON, "';' is required", scanner);
+        return new ClickNode(selector);
     }
 
     public static IInstructionNode parseWaitFor(Scanner scanner) {
         require(WAITFORPAT, "'WaitFor' is required", scanner);
         Selector selector = parseSelector(scanner);
+        require(SEMICOLON, "';' is required", scanner);
         return new WaitForNode(selector);
+    }
+    public static IInstructionNode parseScreenshot(Scanner scanner) {
+        Selector selector = parseSelector(scanner);
+        require(AS, "'as' is required", scanner);
+        require(FILE, "'file' is required", scanner);
+        String file = parseBracketString(scanner);
+        require(SEMICOLON, "';' is required", scanner);
+        return new ScreenshotNode(selector, file);
     }
 
     public static Selector parseSelector(Scanner scanner) {
+        String description = parseBracketString(scanner);
+        require(WITH, "'with' is required", scanner);
+        require(SELECTOR, "'selector' is required", scanner);
+        String selector = parseBracketString(scanner);
+        require(SEMICOLON, "';' is required", scanner);
+        return new Selector(description, selector);
+    }
+
+    public static String parseBracketString(Scanner scanner) {
         require(OPENPAREN, "'(' is required", scanner);
         String description = "";
         while (scanner.hasNext(CLOSEPAREN) == false) {
             description += scanner.next();
         }
         require(CLOSEPAREN, "')' is required", scanner);
-        require(WITH, "'with' is required", scanner);
-        require(SELECTOR, "'selector' is required", scanner);
-        require(OPENPAREN, "'(' is required", scanner);
-        String selector = "";
-        while (scanner.hasNext(CLOSEPAREN) == false) {
-            selector += scanner.next();
-        }
-        require(CLOSEPAREN, "')' is required", scanner);
-        require(SEMICOLON, "';' is required", scanner);
-        return new Selector(description, selector);
+        return description;
     }
 }
