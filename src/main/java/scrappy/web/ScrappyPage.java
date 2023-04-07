@@ -11,6 +11,12 @@ import scrappy.web.instructions.nodes.IInstructionNode;
  * Scraps data from the webpage
  */
 public class ScrappyPage {
+    private IInstructionNode defaultInstruction;
+
+    public ScrappyPage() {
+        defaultInstruction = InstructionParser.parseFile("default.instruction");
+    }
+
     /**
      * Captures data based on instructions
      * @param url
@@ -19,15 +25,21 @@ public class ScrappyPage {
      */
     public void capture(String url, String instructions, String location) {
         try (Playwright playwright = Playwright.create()) {
-            Browser browser = playwright.chromium().launch();
-            Page page = browser.newPage();
+            try (Browser browser = playwright.chromium().launch()) {
+                Page page = browser.newPage();
 
-            Variables var = new Variables();
-            var.put("url", url);
-            var.put("location", location);
+                Variables var = new Variables();
+                var.put("url", url);
+                var.put("location", location);
 
-            IInstructionNode instruct = InstructionParser.parse(instructions);
-            instruct.apply(page, var);
+                IInstructionNode instruct;
+                if (instructions == null || instructions.isBlank()) {
+                    instruct = defaultInstruction;
+                } else {
+                    instruct = InstructionParser.parse(instructions);
+                }
+                instruct.apply(page, var);
+            }
         }
     }
 }

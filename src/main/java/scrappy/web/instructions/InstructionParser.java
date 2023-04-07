@@ -4,7 +4,8 @@ import scrappy.web.instructions.nodes.*;
 import scrappy.web.instructions.parameters.CaptureType;
 import scrappy.web.instructions.parameters.Selector;
 
-import javax.swing.text.html.HTML;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -51,6 +52,18 @@ public class InstructionParser {
 
     public static IInstructionNode parse(String instructions) {
         Scanner scanner = new Scanner(instructions).useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
+        IInstructionNode node = parseProgram(scanner);
+        scanner.close();
+        return node;
+    }
+
+    public static IInstructionNode parseFile(String file) {
+        Scanner scanner;
+        try {
+            scanner = new Scanner(new File(file)).useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         IInstructionNode node = parseProgram(scanner);
         scanner.close();
         return node;

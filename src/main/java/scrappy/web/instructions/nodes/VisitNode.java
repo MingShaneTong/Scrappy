@@ -12,6 +12,7 @@ public class VisitNode implements IInstructionNode {
 
     @Override
     public void apply(Page page, Variables var) {
-        page.navigate(url);
+        String baseUrl = var.get("url");
+        page.navigate(baseUrl + url);
     }
 }
