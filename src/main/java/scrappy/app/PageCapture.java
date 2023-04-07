@@ -29,14 +29,18 @@ public class PageCapture {
                 CapturePages(page, subIssue, nextLocation);
             }
         } else if(issue instanceof UrlIssue) {
-            Path path = Paths.get(nextLocation);
-            try {
-                Files.createDirectories(path);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            UrlIssue urlIssue = (UrlIssue) issue;
-            page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), nextLocation);
+            performCapture(page, issue, nextLocation);
         }
+    }
+
+    private void performCapture(ScrappyPage page, Issue issue, String location) {
+        Path path = Paths.get(location);
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        UrlIssue urlIssue = (UrlIssue) issue;
+        page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), location);
     }
 }
