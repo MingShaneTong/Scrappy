@@ -2,6 +2,7 @@ package scrappy.web.instructions;
 
 import scrappy.web.instructions.nodes.CommentNode;
 import scrappy.web.instructions.nodes.IInstructionNode;
+import scrappy.web.instructions.nodes.WaitForNode;
 import scrappy.web.instructions.parameters.Selector;
 
 import java.util.Scanner;
@@ -28,7 +29,7 @@ public class InstructionParser {
     public static final Pattern COMMENTPAT = Pattern.compile("//");
     public static final Pattern VISITPAT = Pattern.compile("Visit");
     public static final Pattern CLICKPAT = Pattern.compile("Click");
-    public static final Pattern WAITPAT = Pattern.compile("Wait");
+    public static final Pattern WAITFORPAT = Pattern.compile("WaitFor");
     public static final Pattern SCREENSHOTPAT = Pattern.compile("Screenshot");
     public static final Pattern CAPTUREPAT = Pattern.compile("Capture");
     public static final Pattern FOREACHPAT = Pattern.compile("ForEach");
@@ -62,8 +63,8 @@ public class InstructionParser {
             node = parseVisit(scanner);
         } else if (scanner.hasNext(CLICKPAT)) {
             node = parseClick(scanner);
-        } else if (scanner.hasNext(WAITPAT)) {
-
+        } else if (scanner.hasNext(WAITFORPAT)) {
+            node = parseWaitFor(scanner);
         } else if (scanner.hasNext(SCREENSHOTPAT)) {
 
         } else if (scanner.hasNext(CAPTUREPAT)) {
@@ -98,6 +99,12 @@ public class InstructionParser {
         require(CLICKPAT, "'Click' is required", scanner);
         Selector selector = parseSelector(scanner);
         return null;
+    }
+
+    public static IInstructionNode parseWaitFor(Scanner scanner) {
+        require(WAITFORPAT, "'WaitFor' is required", scanner);
+        Selector selector = parseSelector(scanner);
+        return new WaitForNode(selector);
     }
 
     public static Selector parseSelector(Scanner scanner) {
