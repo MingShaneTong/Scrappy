@@ -1,8 +1,10 @@
 package scrappy.web.instructions;
 
 import scrappy.web.instructions.nodes.*;
+import scrappy.web.instructions.parameters.CaptureType;
 import scrappy.web.instructions.parameters.Selector;
 
+import javax.swing.text.html.HTML;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -31,12 +33,16 @@ public class InstructionParser {
     public static final Pattern SCREENSHOTPAT = Pattern.compile("Screenshot");
     public static final Pattern CAPTUREPAT = Pattern.compile("Capture");
     public static final Pattern FOREACHPAT = Pattern.compile("ForEach");
+    public static final Pattern HTMLPAT = Pattern.compile("HTML");
+    public static final Pattern TEXTCONTENTPAT = Pattern.compile("TextContent");
 
     public static final Pattern OPENPAREN = Pattern.compile("\\(");
     public static final Pattern CLOSEPAREN = Pattern.compile("\\)");
 
     public static final Pattern WITH = Pattern.compile("with");
     public static final Pattern AS = Pattern.compile("as");
+    public static final Pattern FROM = Pattern.compile("from");
+    public static final Pattern TO = Pattern.compile("to");
     public static final Pattern FILE = Pattern.compile("file");
 
     public static final Pattern SELECTOR = Pattern.compile("selector");    public static final Pattern SEMICOLON = Pattern.compile(";");
@@ -68,7 +74,7 @@ public class InstructionParser {
         } else if (scanner.hasNext(SCREENSHOTPAT)) {
             node = parseScreenshot(scanner);
         } else if (scanner.hasNext(CAPTUREPAT)) {
-
+            node = parseCapture(scanner);
         } else if (scanner.hasNext(FOREACHPAT)) {
 
         } else {
@@ -115,6 +121,26 @@ public class InstructionParser {
         String file = parseBracketString(scanner);
         require(SEMICOLON, "';' is required", scanner);
         return new ScreenshotNode(selector, file);
+    }
+
+    public static IInstructionNode parseCapture(Scanner scanner) {
+        CaptureType type;
+        if (scanner.hasNext(HTMLPAT)) {
+            require(HTMLPAT, "'HTML' is required", scanner);
+            type = CaptureType.HTML;
+        } else if (scanner.hasNext(TEXTCONTENTPAT)) {
+            require(TEXTCONTENTPAT, "'TextContent' is required", scanner);
+            type = CaptureType.TEXTCONTENT;
+        } else {
+            require(HTMLPAT, "Capture type is not valid", scanner);
+            return null;
+        }
+        require(FROM, "'from' is required", scanner);
+        Selector selector = parseSelector(scanner);
+        require(TO, "'to' is required", scanner);
+        require(FILE, "'file' is required", scanner);
+        String file = parseBracketString(scanner);
+        return new CaptureNode(type, selector, file);
     }
 
     public static Selector parseSelector(Scanner scanner) {

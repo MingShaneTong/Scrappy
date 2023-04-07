@@ -8,8 +8,8 @@ import scrappy.web.instructions.parameters.Selector;
 import java.nio.file.Paths;
 
 public class ScreenshotNode implements IInstructionNode {
-    private Selector selector;
-    private String file;
+    private final Selector selector;
+    private final String file;
 
     public ScreenshotNode(Selector selector, String file) {
         this.selector = selector;

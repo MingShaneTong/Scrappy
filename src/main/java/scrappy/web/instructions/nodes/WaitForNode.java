@@ -5,7 +5,7 @@ import scrappy.web.instructions.Variables;
 import scrappy.web.instructions.parameters.Selector;
 
 public class WaitForNode implements IInstructionNode {
-    private Selector selector;
+    private final Selector selector;
 
     public WaitForNode(Selector selector) {
         this.selector = selector;
