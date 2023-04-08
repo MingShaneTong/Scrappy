@@ -1,24 +1,32 @@
 {
     "fields": {
-       "project":
-       {
-          "key": "%s"
-       },
-       "summary": "%s",
-       "description": {
-          "type": "doc",
-          "version": 1,
-          "content": []
+        "project":
+        {
+            "key": "%s"
+        },
+        "summary": "%s",
+        "description": {
+            "type": "doc",
+            "version": 1,
+            "content": [{
+                "type": "paragraph",
+                "content": [{
+                    "type": "text",
+                    "text": "%s",
+                    "marks": [{
+          			    "type": "code"
+          			}]
+          		}]
+          	}]
         },
         "issuetype": {
-          "name": "Scrappy Snapshot"
-       }
-   },
-   "update":{
-      "issuelinks":[
-         {
-            "add":{
-               "type":{
+            "name": "Scrappy Snapshot"
+        }
+    },
+    "update": {
+        "issuelinks": [{
+            "add": {
+               "type": {
                   "name": "Snapshot",
                   "inward": "is snapshot by",
                   "outward": "snapshot of"
@@ -27,7 +35,6 @@
                   "key": "%s"
                }
             }
-         }
-      ]
-   }
+        }]
+    }
 }

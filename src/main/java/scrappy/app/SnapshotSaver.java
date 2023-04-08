@@ -53,6 +53,7 @@ public class SnapshotSaver {
             .setProject(project)
             .setSummary(summary)
             .setIssueLink(issue.getKey())
+            .setDescription("")
             .toString();
 
         JSONObject newIssue = JiraApi.createIssue(api, json);
