@@ -7,7 +7,7 @@ public class Variables {
     public Map<String, String> variables;
 
     public Variables() {
-        variables = new HashMap<String, String>();
+        variables = new HashMap<>();
     }
 
     public void put(String var, String value) {

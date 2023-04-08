@@ -7,19 +7,11 @@ import scrappy.web.instructions.parameters.Selector;
 
 import java.nio.file.Paths;
 
-public class ScreenshotNode implements IInstructionNode {
-    private final Selector selector;
-    private final String file;
-
-    public ScreenshotNode(Selector selector, String file) {
-        this.selector = selector;
-        this.file = file;
-    }
-
+public record ScreenshotNode(Selector selector, String file) implements IInstructionNode {
     @Override
     public void apply(Page page, Variables var) {
         String folder = var.get("location");
-        page.locator(selector.getSelector())
+        page.locator(selector.selector())
             .screenshot(
                 new Locator.ScreenshotOptions()
                     .setPath(Paths.get(folder + file))

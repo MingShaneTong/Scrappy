@@ -4,15 +4,9 @@ import com.microsoft.playwright.Page;
 import scrappy.web.instructions.Variables;
 import scrappy.web.instructions.parameters.Selector;
 
-public class WaitForNode implements IInstructionNode {
-    private final Selector selector;
-
-    public WaitForNode(Selector selector) {
-        this.selector = selector;
-    }
-
+public record WaitForNode(Selector selector) implements IInstructionNode {
     @Override
     public void apply(Page page, Variables var) {
-        page.waitForSelector(selector.getSelector());
+        page.waitForSelector(selector.selector());
     }
 }

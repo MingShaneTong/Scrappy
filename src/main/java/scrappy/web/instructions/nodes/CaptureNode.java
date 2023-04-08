@@ -9,22 +9,12 @@ import scrappy.web.instructions.parameters.Selector;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class CaptureNode implements IInstructionNode {
-    private final CaptureType type;
-    private final Selector selector;
-    private final String file;
-
-    public CaptureNode(CaptureType type, Selector selector, String file) {
-        this.type = type;
-        this.selector = selector;
-        this.file = file;
-    }
-
+public record CaptureNode(CaptureType type, Selector selector, String file) implements IInstructionNode {
     @Override
     public void apply(Page page, Variables var) {
         String folder = var.get("location");
 
-        Locator locator = page.locator(selector.getSelector());
+        Locator locator = page.locator(selector.selector());
         try (FileWriter writer = new FileWriter(folder + file)) {
             switch (type) {
                 case HTML:
