@@ -42,6 +42,11 @@ public class Diff {
             newRoute.add(change);
             visited.add(change.newPos());
             routes.add(newRoute);
+
+            // found end
+            if (change.newPos().equals(end)) {
+                return newRoute.stream().toList();
+            }
         }
 
         while (routes.isEmpty() == false) {
