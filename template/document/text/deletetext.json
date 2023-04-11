@@ -1,0 +1,18 @@
+{
+  "type": "text",
+  "text": "%s",
+  "marks": [
+    {
+      "type": "strong"
+    },
+    {
+      "type": "textColor",
+      "attrs": {
+        "color": "#bf2600"
+      }
+    },
+    {
+      "type": "strike"
+    }
+  ]
+}

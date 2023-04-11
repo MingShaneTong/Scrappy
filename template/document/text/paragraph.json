@@ -1,0 +1,23 @@
+{
+  "type": "paragraph",
+  "content": [
+    {
+      "type": "text",
+      "text": "rtxkkrrkxx",
+      "marks": [
+        {
+          "type": "strong"
+        },
+        {
+          "type": "textColor",
+          "attrs": {
+            "color": "#bf2600"
+          }
+        },
+        {
+          "type": "strike"
+        }
+      ]
+    }
+  ]
+},

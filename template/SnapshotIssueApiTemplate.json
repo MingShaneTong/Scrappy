@@ -1,0 +1,36 @@
+{
+  "fields": {
+    "project":
+    {
+      "key": "%s"
+    },
+    "summary": "%s",
+    "description": {
+      "type": "doc",
+      "version": 1,
+      "content": [{
+        "type": "paragraph",
+        "content": [
+          %s
+      ]
+      }]
+    },
+    "issuetype": {
+      "name": "Scrappy Snapshot"
+    }
+  },
+  "update": {
+    "issuelinks": [{
+      "add": {
+        "type": {
+          "name": "Snapshot",
+          "inward": "is snapshot by",
+          "outward": "snapshot of"
+        },
+        "outwardIssue":{
+          "key": "%s"
+        }
+      }
+    }]
+  }
+}
