@@ -1,4 +1,4 @@
-Visit ( /  ) ;
+Visit ( / ) ;
 Screenshot ( Page ) with selector ( body ) as file ( main.png ) ;
 Capture HTML from ( Page ) with selector ( //html ) to file ( main.html ) ;
 Capture TextContent from ( Page ) with selector ( body ) to file ( main.txt ) ;

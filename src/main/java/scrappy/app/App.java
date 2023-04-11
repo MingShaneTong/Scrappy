@@ -9,8 +9,6 @@ import scrappy.web.ScrappyPage;
 import java.io.File;
 
 public class App {
-    public static final String location = "artifacts/";
-
     private final String apiUrl;
     private final String project;
     private final String login;
@@ -27,12 +25,15 @@ public class App {
 
     public static void deleteDirectory(File file)
     {
+        if (!file.exists()) { return; }
+
         for (File subfile : file.listFiles()) {
             if (subfile.isDirectory()) {
                 deleteDirectory(subfile);
             }
             subfile.delete();
         }
+        file.delete();
     }
 
     public void start() {
@@ -42,21 +43,28 @@ public class App {
         System.out.println("Collecting Jira Data...");
         ExecutionIssue exe = JiraIssues.getExecution(api, executionJira);
 
-        // delete artifacts
+        // use previous current as new archive
         System.out.println("Resetting artifacts...");
-        File file = new File(location);
-        deleteDirectory(file);
+        File archiveFolder = new File(AppLocations.ARCHIVE);
+        File artifactsFolder = new File(AppLocations.ARTIFACTS);
+        deleteDirectory(archiveFolder);
+        artifactsFolder.renameTo(archiveFolder);
 
         // capture data
-        System.out.println("Capturing artifacts..");
+        System.out.println("Capturing artifacts...");
         ScrappyPage page = new ScrappyPage();
         PageCapture collector = new PageCapture();
-        collector.CapturePages(page, exe, location);
+        collector.capturePages(page, exe, AppLocations.ARTIFACTS);
+
+        // collecting diff
+        System.out.println("Checking for differences...");
+        DiffDetector dd = new DiffDetector();
+        dd.detectDifferences(exe);
 
         // create jira with data attached
         System.out.println("Documenting artifacts on Jira...");
         SnapshotSaver saver = new SnapshotSaver();
-        saver.SaveIssues(api, project, exe, location);
+        saver.SaveIssues(api, project, exe, AppLocations.ARTIFACTS);
     }
 
     public static void main(String[] args) {
