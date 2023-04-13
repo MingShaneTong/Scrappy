@@ -8,12 +8,9 @@
     "description": {
       "type": "doc",
       "version": 1,
-      "content": [{
-        "type": "paragraph",
-        "content": [
-          %s
+      "content": [
+        %s
       ]
-      }]
     },
     "issuetype": {
       "name": "Scrappy Snapshot"

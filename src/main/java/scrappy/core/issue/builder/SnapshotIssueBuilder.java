@@ -13,7 +13,7 @@ public class SnapshotIssueBuilder {
 
     static {
         try {
-            Path path = Paths.get("template/SnapshotIssueApiTemplate");
+            Path path = Paths.get("template/SnapshotIssueApiTemplate.json");
             formatString = new String(Files.readAllBytes(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -41,7 +41,7 @@ public class SnapshotIssueBuilder {
     }
 
     public SnapshotIssueBuilder setDescription(String description) {
-        this.issueLink = description;
+        this.description = description;
         return this;
     }
 

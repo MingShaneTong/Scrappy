@@ -1,5 +1,6 @@
 package scrappy.app;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import scrappy.core.issue.builder.SnapshotIssueBuilder;
 import scrappy.core.issue.types.Issue;
@@ -9,6 +10,11 @@ import scrappy.jira.JiraApi;
 import scrappy.jira.JiraApiProps;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,7 +34,7 @@ public class SnapshotSaver {
     public void SaveIssues(JiraApiProps api, String project, Issue issue, String location) {
         if (issue.getState() != IssueState.InUse) { return; }
 
-        String nextLocation = location + "/" + issue.getKey();
+        String nextLocation = location + issue.getKey() + "/" ;
         if (issue.hasSubIssues()) {
             for (Issue subIssue : issue) {
                 SaveIssues(api, project, subIssue, nextLocation);
@@ -46,6 +52,17 @@ public class SnapshotSaver {
      * @param folder
      */
     public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder) {
+        String artifacts = AppLocations.ARTIFACTS + folder;
+        String diff = AppLocations.DIFF + folder + AppLocations.DIFF_FILE;
+
+        Path diffPath = Paths.get(diff);
+        String diffJson;
+        try {
+            diffJson = Files.readString(diffPath, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         String time = TIMEFORMATTER.format(LocalDateTime.now());
         String summary = String.format("%s %s", time, issue.getSummary());
 
@@ -53,13 +70,20 @@ public class SnapshotSaver {
             .setProject(project)
             .setSummary(summary)
             .setIssueLink(issue.getKey())
-            .setDescription("")
+            .setDescription(diffJson)
             .toString();
 
-        JSONObject newIssue = JiraApi.createIssue(api, json);
-        String issueKey = newIssue.getString("key");
+        String issueKey;
+        try {
+            JSONObject newIssue = JiraApi.createIssue(api, json);
+            issueKey = newIssue.getString("key");
+        } catch (JSONException e) {
+            System.out.println("Snapshot Creation failed for " + issue.getKey());
+            System.out.println(json);
+            return;
+        }
 
-        for (File attachment : new File(folder).listFiles()) {
+        for (File attachment : new File(artifacts).listFiles()) {
             JiraApi.createAttachment(api, issueKey, attachment);
         }
     }

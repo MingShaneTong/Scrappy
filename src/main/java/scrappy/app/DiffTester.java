@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
-import java.util.List;
 
 public class DiffTester {
     public static void main(String[] args) throws IOException {
@@ -22,11 +21,6 @@ public class DiffTester {
         diff_match_patch diffLib = new diff_match_patch();
         LinkedList<diff_match_patch.Diff> diffs = diffLib.diff_main(str1, str2);
         diffLib.diff_cleanupSemantic(diffs);
-        System.out.println(diffLib.diff_prettyHtml(diffs));
 
-//        for (diff_match_patch.Diff d: diffs) {
-//            System.out.println(d.operation);
-//            System.out.println(d.text);
-//        }
     }
 }

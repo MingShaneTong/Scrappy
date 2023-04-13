@@ -37,10 +37,11 @@ public class PageCapture {
         Path path = Paths.get(location);
         try {
             Files.createDirectories(path);
+            UrlIssue urlIssue = (UrlIssue) issue;
+            page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), location);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Problem Capturing " + issue.getKey());
+            System.out.println(e);
         }
-        UrlIssue urlIssue = (UrlIssue) issue;
-        page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), location);
     }
 }
