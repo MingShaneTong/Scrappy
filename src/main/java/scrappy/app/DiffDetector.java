@@ -1,6 +1,7 @@
 package scrappy.app;
 
 import name.fraser.neil.plaintext.diff_match_patch;
+import scrappy.core.issue.builder.DescriptionBuilder;
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;
 import scrappy.core.issue.types.UrlIssue;
@@ -17,40 +18,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DiffDetector {
-    private static final String deleteAdf;
-    private static final String insertAdf;
-    private static final String plaintextAdf;
-    private static final String hardbreakAdf;
-    private static final String paragraphAdf;
-    private static final String tableCellAdf;
-    private static final String tableRowAdf;
-    private static final String tableAdf;
-
-    static {
-        try {
-            Path deletePath = Paths.get("template/document/text/deletetext.json");
-            Path insertPath = Paths.get("template/document/text/inserttext.json");
-            Path plaintextPath = Paths.get("template/document/text/plaintext.json");
-            Path hardbreakPath = Paths.get("template/document/text/hardbreak.json");
-            Path paragraphPath = Paths.get("template/document/text/paragraph.json");
-            Path tableCellPath = Paths.get("template/document/table/tableCell.json");
-            Path tableRowPath = Paths.get("template/document/table/tableRow.json");
-            Path tablePath = Paths.get("template/document/table/table.json");
-
-            deleteAdf = new String(Files.readAllBytes(deletePath));
-            insertAdf = new String(Files.readAllBytes(insertPath));
-            plaintextAdf = new String(Files.readAllBytes(plaintextPath));
-            hardbreakAdf = new String(Files.readAllBytes(hardbreakPath));
-            paragraphAdf = new String(Files.readAllBytes(paragraphPath));
-            tableCellAdf = new String(Files.readAllBytes(tableCellPath));
-            tableRowAdf = new String(Files.readAllBytes(tableRowPath));
-            tableAdf = new String(Files.readAllBytes(tablePath));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
     public void detectDifferences(Issue issue) {
         detectDifferences(issue, "");
     }
@@ -156,48 +123,62 @@ public class DiffDetector {
             });
 
             // create table rows
-            String deleteCell = String.format(tableCellAdf,
-                String.format(paragraphAdf,
-                    String.join(", ", deleteStream))
+            String deleteCell = DescriptionBuilder.createTableCellAdf(
+                DescriptionBuilder.createParagraphAdf(
+                    String.join(", ", deleteStream)
+                )
             );
-            String insertCell = String.format(tableCellAdf,
-                String.format(paragraphAdf,
-                    String.join(", ", insertStream))
+            String insertCell = DescriptionBuilder.createTableCellAdf(
+                DescriptionBuilder.createParagraphAdf(
+                    String.join(", ", insertStream)
+                )
             );
 
-            return String.format(tableRowAdf, deleteCell + ", " + insertCell);
+            return DescriptionBuilder.createTableRowAdf(deleteCell + ", " + insertCell);
         }).collect(Collectors.joining(", "));
 
-        return String.format(tableAdf, tableRows);
+        return DescriptionBuilder.createTableAdf(tableRows);
     }
 
     private String deleteToAdf(String text) {
         return Arrays.stream(text.split("(\\r\\n|\\r|\\n)"))
-            .map(d -> String.format(deleteAdf, d))
-            .collect(Collectors.joining(", " + hardbreakAdf + ", "));
+            .map(DescriptionBuilder::createDeleteTextAdf)
+            .collect(
+                Collectors.joining(
+                    ", " + DescriptionBuilder.createHardBreakAdf() + ", "
+                )
+            );
     }
 
     private String insertToAdf(String text) {
         return Arrays.stream(text.split("(\\r\\n|\\r|\\n)"))
-            .map(d -> String.format(insertAdf, d))
-            .collect(Collectors.joining("," + hardbreakAdf + ","));
+            .map(DescriptionBuilder::createInsertTextAdf)
+            .collect(
+                Collectors.joining(
+                    ", " + DescriptionBuilder.createHardBreakAdf() + ", "
+                )
+            );
     }
 
     private String plaintextToAdf(String text) {
         return Arrays.stream(text.split("(\\r\\n|\\r|\\n)"))
-            .map(d -> String.format(plaintextAdf, d))
-            .collect(Collectors.joining("," + hardbreakAdf + ","));
+            .map(DescriptionBuilder::createPlainTextAdf)
+            .collect(
+                Collectors.joining(
+                    ", " + DescriptionBuilder.createHardBreakAdf() + ", "
+                )
+            );
     }
 
     private String sampleStart(String text) {
         String[] lines = text.split("(\\r\\n|\\r|\\n)");
-        String last = lines[0];
-        return String.format(plaintextAdf, last);
+        String start = lines[0];
+        return DescriptionBuilder.createPlainTextAdf(start);
     }
 
     private String sampleEnd(String text) {
         String[] lines = text.split("(\\r\\n|\\r|\\n)");
         String last = lines[lines.length - 1];
-        return String.format(plaintextAdf, last);
+        return DescriptionBuilder.createPlainTextAdf(last);
     }
 }

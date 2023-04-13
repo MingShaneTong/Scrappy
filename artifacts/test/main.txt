@@ -1,4 +1,16 @@
-I am the very model of a modern Major-General,
-I've information vegetable, animal, and mineral,
-I know the kings of England, and I quote the fights historical,
-From Marathon to Waterloo, in order categorical.
+{
+      "type": "doc",
+      "version": 1,
+      "content": [{
+            "type": "paragraph",
+            "content": [
+                  {
+                        "type": "hardBreak"
+                  }, 
+                  {
+                        "type": "text",      
+                        "text": ""      
+                  }
+            ]
+       }]
+}
