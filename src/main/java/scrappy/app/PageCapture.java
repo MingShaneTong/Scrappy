@@ -20,13 +20,13 @@ public class PageCapture {
      * @param issue
      * @param location
      */
-    public void CapturePages(ScrappyPage page, Issue issue, String location) {
+    public void capturePages(ScrappyPage page, Issue issue, String location) {
         if (issue.getState() != IssueState.InUse) { return; }
 
         String nextLocation = location + issue.getKey() + "/";
         if (issue.hasSubIssues()) {
             for (Issue subIssue : issue) {
-                CapturePages(page, subIssue, nextLocation);
+                capturePages(page, subIssue, nextLocation);
             }
         } else if(issue instanceof UrlIssue) {
             performCapture(page, issue, nextLocation);
@@ -37,10 +37,11 @@ public class PageCapture {
         Path path = Paths.get(location);
         try {
             Files.createDirectories(path);
+            UrlIssue urlIssue = (UrlIssue) issue;
+            page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), location);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Problem Capturing " + issue.getKey());
+            System.out.println(e);
         }
-        UrlIssue urlIssue = (UrlIssue) issue;
-        page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), location);
     }
 }

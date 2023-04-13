@@ -1,0 +1,15 @@
+{
+  "type": "text",
+  "text": "%s",
+  "marks": [
+    {
+      "type": "strong"
+    },
+    {
+      "type": "textColor",
+      "attrs": {
+        "color": "#006644"
+      }
+    }
+  ]
+}
