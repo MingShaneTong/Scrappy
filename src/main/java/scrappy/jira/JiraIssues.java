@@ -20,7 +20,7 @@ public class JiraIssues {
     private static Stream<JSONObject> jsonArrayToStream(JSONArray array) {
         return IntStream
             .range(0, array.length())
-            .mapToObj(i -> array.getJSONObject(i));
+            .mapToObj(array::getJSONObject);
     }
 
     /**
@@ -46,6 +46,9 @@ public class JiraIssues {
             .getJSONObject("status")
             .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
+        if (state != IssueState.InUse) {
+            throw new RuntimeException("Execution jira not in use");
+        }
 
         // get issue links
         JSONArray issuelinks = fields.getJSONArray("issuelinks");
@@ -58,7 +61,7 @@ public class JiraIssues {
                 String subIssueKey = subIssue.getJSONObject("outwardIssue")
                     .getString("key");
                 return JiraIssues.getSubIssue(api, subIssueKey);
-            })
+            }).filter(Objects::nonNull)
             .collect(Collectors.toList());
 
         return new ExecutionIssue(issueKey, summary, state, subIssues);
@@ -103,6 +106,9 @@ public class JiraIssues {
             .getJSONObject("status")
             .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
+        if (state != IssueState.InUse) {
+            return null;
+        }
 
         // get issue links
         JSONArray issuelinks = fields.getJSONArray("issuelinks");
@@ -116,7 +122,7 @@ public class JiraIssues {
                 String subIssueKey = subIssue.getJSONObject("outwardIssue")
                     .getString("key");
                 return JiraIssues.getSubIssue(api, subIssueKey);
-            })
+            }).filter(Objects::nonNull)
             .collect(Collectors.toList());
 
         return new FolderIssue(issueKey, summary, state, subIssues);
@@ -138,9 +144,12 @@ public class JiraIssues {
             .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
         String url = fields.getString(URLFIELD);
+        if (state != IssueState.InUse) {
+            return null;
+        }
 
         String instructions = "";
-        if (fields.has(INSTRUCTIONFIELD) && fields.isNull(INSTRUCTIONFIELD) == false) {
+        if (fields.has(INSTRUCTIONFIELD) && !fields.isNull(INSTRUCTIONFIELD)) {
             JSONArray instructionsArray = fields
                 .getJSONObject(INSTRUCTIONFIELD)
                 .getJSONArray("content");
