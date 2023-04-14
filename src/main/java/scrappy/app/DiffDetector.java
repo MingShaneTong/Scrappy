@@ -1,6 +1,6 @@
 package scrappy.app;
 
-import name.fraser.neil.plaintext.diff_match_patch;
+import scrappy.core.diff.DiffMatch;
 import scrappy.core.issue.builder.DescriptionBuilder;
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;
@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,9 +42,8 @@ public class DiffDetector {
             String archiveStr = Files.exists(archive) ? Files.readString(archive) : "";
             String artifactsStr = Files.exists(artifacts) ? Files.readString(artifacts) : "";
 
-            diff_match_patch diffLib = new diff_match_patch();
-            LinkedList<diff_match_patch.Diff> diffs = diffLib.diff_main(archiveStr, artifactsStr);
-            diffLib.diff_cleanupSemantic(diffs);
+            DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffSize.WORD);
+            List<DiffMatch.Diff> diffs = diffMatch.findDiffs(archiveStr, artifactsStr);
             String diffString = diffToAdf(diffs);
 
             Files.createDirectories(diff.getParent());
@@ -57,18 +55,18 @@ public class DiffDetector {
         }
     }
 
-    private String diffToAdf(List<diff_match_patch.Diff> diffs) {
-        List<List<diff_match_patch.Diff>> changeGroups = new ArrayList<>();
-        diff_match_patch.Diff previous = null;
-        List<diff_match_patch.Diff> currentGroup = new ArrayList<>();
+    private String diffToAdf(List<DiffMatch.Diff> diffs) {
+        List<List<DiffMatch.Diff>> changeGroups = new ArrayList<>();
+        DiffMatch.Diff previous = null;
+        List<DiffMatch.Diff> currentGroup = new ArrayList<>();
 
         // group diffs for differences
-        for (diff_match_patch.Diff current: diffs) {
-            switch (current.operation) {
+        for (DiffMatch.Diff current: diffs) {
+            switch (current.operation()) {
                 case DELETE:
                 case INSERT:
                     // sample start
-                    if (currentGroup.isEmpty() && previous != null && previous.operation == diff_match_patch.Operation.EQUAL) {
+                    if (currentGroup.isEmpty() && previous != null && previous.operation() == DiffMatch.Operation.EQUAL) {
                         currentGroup.add(previous);
                     }
                     currentGroup.add(current);
@@ -77,7 +75,7 @@ public class DiffDetector {
                     if (previous != null) {
                         currentGroup.add(current);
                     }
-                    if (current.text.contains("\n")){
+                    if (current.text().contains("\n") && !currentGroup.isEmpty()){
                         changeGroups.add(currentGroup);
                         currentGroup = new ArrayList<>();
                     }
@@ -89,32 +87,28 @@ public class DiffDetector {
             changeGroups.add(currentGroup);
         }
 
-        if (changeGroups.isEmpty()) {
-            return "";
-        }
-
         // to strings
         String tableRows = changeGroups.stream().map(group -> {
             List<String> deleteStream = new ArrayList<>();
             List<String> insertStream = new ArrayList<>();
 
             // create delete and insert stream
-            group.stream().forEach(diff -> {
-                switch (diff.operation) {
+            group.forEach(diff -> {
+                switch (diff.operation()) {
                     case DELETE:
-                        deleteStream.add(deleteToAdf(diff.text));
+                        deleteStream.add(deleteToAdf(diff.text()));
                         break;
                     case INSERT:
-                        insertStream.add(insertToAdf(diff.text));
+                        insertStream.add(insertToAdf(diff.text()));
                         break;
                     case EQUAL:
                         String adf;
                         if (diff == group.get(0)) {
-                            adf = sampleEnd(diff.text);
+                            adf = sampleEnd(diff.text());
                         } else if (diff == group.get(group.size() - 1)) {
-                            adf = sampleStart(diff.text);
+                            adf = sampleStart(diff.text());
                         } else {
-                            adf = plaintextToAdf(diff.text);
+                            adf = plaintextToAdf(diff.text());
                         }
                         deleteStream.add(adf);
                         insertStream.add(adf);
@@ -136,6 +130,10 @@ public class DiffDetector {
 
             return DescriptionBuilder.createTableRowAdf(deleteCell + ", " + insertCell);
         }).collect(Collectors.joining(", "));
+
+        if (tableRows.isEmpty()) {
+            return "";
+        }
 
         return DescriptionBuilder.createTableAdf(tableRows);
     }
