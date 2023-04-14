@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +75,7 @@ public class DiffDetector {
                     if (previous != null) {
                         currentGroup.add(current);
                     }
-                    if (current.text().contains("\n")){
+                    if (current.text().contains("\n") && !currentGroup.isEmpty()){
                         changeGroups.add(currentGroup);
                         currentGroup = new ArrayList<>();
                     }
@@ -88,17 +87,13 @@ public class DiffDetector {
             changeGroups.add(currentGroup);
         }
 
-        if (changeGroups.isEmpty()) {
-            return "";
-        }
-
         // to strings
         String tableRows = changeGroups.stream().map(group -> {
             List<String> deleteStream = new ArrayList<>();
             List<String> insertStream = new ArrayList<>();
 
             // create delete and insert stream
-            group.stream().forEach(diff -> {
+            group.forEach(diff -> {
                 switch (diff.operation()) {
                     case DELETE:
                         deleteStream.add(deleteToAdf(diff.text()));
@@ -135,6 +130,10 @@ public class DiffDetector {
 
             return DescriptionBuilder.createTableRowAdf(deleteCell + ", " + insertCell);
         }).collect(Collectors.joining(", "));
+
+        if (tableRows.isEmpty()) {
+            return "";
+        }
 
         return DescriptionBuilder.createTableAdf(tableRows);
     }
