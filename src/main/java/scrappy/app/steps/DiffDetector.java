@@ -1,5 +1,6 @@
-package scrappy.app;
+package scrappy.app.steps;
 
+import scrappy.app.AppLocations;
 import scrappy.core.diff.DiffMatch;
 import scrappy.core.issue.builder.DescriptionBuilder;
 import scrappy.core.issue.types.Issue;
@@ -11,51 +12,55 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DiffDetector {
-    public void detectDifferences(Issue issue) {
-        detectDifferences(issue, "");
+    public boolean detectDifferences(Issue issue, Map<Issue, Boolean> diffMap) {
+        return detectDifferences(issue, "", diffMap);
     }
 
-    public void detectDifferences(Issue issue, String location) {
-        if (issue.getState() != IssueState.InUse) { return; }
+    public boolean detectDifferences(Issue issue, String location, Map<Issue, Boolean> diffMap) {
+        if (issue.getState() != IssueState.InUse) { return false; }
 
         String nextLocation = location + issue.getKey() + "/";
+        boolean containsDifference = false;
         if (issue.hasSubIssues()) {
             for (Issue subIssue : issue) {
-                detectDifferences(subIssue, nextLocation);
+                containsDifference = detectDifferences(subIssue, nextLocation, diffMap) || containsDifference;
             }
         } else if (issue instanceof UrlIssue) {
             Path archive = Paths.get(AppLocations.ARCHIVE + nextLocation + AppLocations.MAIN_FILE);
             Path artifacts = Paths.get(AppLocations.ARTIFACTS + nextLocation + AppLocations.MAIN_FILE);
             Path diff = Paths.get(AppLocations.DIFF + nextLocation + AppLocations.DIFF_FILE);
-            recordDifferences(archive, artifacts, diff);
+            containsDifference = recordDifferences(archive, artifacts, diff);
         }
+        diffMap.put(issue, containsDifference);
+        return containsDifference;
     }
 
-    private void recordDifferences(Path archive, Path artifacts, Path diff) {
+    private boolean recordDifferences(Path archive, Path artifacts, Path diff) {
         try {
             String archiveStr = Files.exists(archive) ? Files.readString(archive) : "";
             String artifactsStr = Files.exists(artifacts) ? Files.readString(artifacts) : "";
 
             DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffSize.WORD);
             List<DiffMatch.Diff> diffs = diffMatch.findDiffs(archiveStr, artifactsStr);
+            diffs = diffMatch.summarise(diffs);
             String diffString = diffToAdf(diffs);
 
             Files.createDirectories(diff.getParent());
             try (FileWriter writer = new FileWriter(String.valueOf(diff))) {
                 writer.write(diffString);
             }
+
+            return !diffString.isEmpty();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String diffToAdf(List<DiffMatch.Diff> diffs) {
+    public String diffToAdf(List<DiffMatch.Diff> diffs) {
         List<List<DiffMatch.Diff>> changeGroups = new ArrayList<>();
         DiffMatch.Diff previous = null;
         List<DiffMatch.Diff> currentGroup = new ArrayList<>();

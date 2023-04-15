@@ -1,0 +1,33 @@
+{
+  "fields": {
+    "project":
+    {
+      "key": "%s"
+    },
+    "summary": "%s",
+    "description": {
+      "type": "doc",
+      "version": 1,
+      "content": [
+        %s
+      ]
+    },
+    "issuetype": {
+      "name": "Scrappy Summary"
+    }
+  },
+  "update": {
+    "issuelinks": [{
+      "add": {
+        "type": {
+          "name": "Execution",
+          "inward": "execution of",
+          "outward": "executed by"
+        },
+        "inwardIssue":{
+          "key": "%s"
+        }
+      }
+    }]
+  }
+}
