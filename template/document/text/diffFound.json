@@ -1,0 +1,12 @@
+{
+  "type": "text",
+  "text": "Diff",
+  "marks": [
+    {
+      "type": "em"
+    },
+    {
+      "type": "strong"
+    }
+  ]
+}

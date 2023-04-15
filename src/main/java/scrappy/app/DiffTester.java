@@ -1,5 +1,6 @@
 package scrappy.app;
 
+import scrappy.app.steps.DiffDetector;
 import scrappy.core.diff.DiffMatch;
 
 import java.io.IOException;
@@ -19,8 +20,9 @@ public class DiffTester {
         String str2 = Files.readString(path2, StandardCharsets.UTF_8);
 
         DiffMatch diffLib = new DiffMatch(DiffMatch.DiffSize.LINE);
+        DiffDetector dd = new DiffDetector();
         List<DiffMatch.Diff> diffs = diffLib.findDiffs(str1, str2);
-
-        System.out.println(diffs);
+        String d = dd.diffToAdf(diffs);
+        System.out.println(d);
     }
 }

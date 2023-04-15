@@ -1,0 +1,6 @@
+{
+  "type": "inlineCard",
+  "attrs": {
+    "url": "%s"
+  }
+}

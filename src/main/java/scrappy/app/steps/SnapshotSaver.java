@@ -1,7 +1,8 @@
-package scrappy.app;
+package scrappy.app.steps;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import scrappy.app.AppLocations;
 import scrappy.core.issue.builder.SnapshotIssueBuilder;
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * Saves snapshots to Jira using the REST API
@@ -31,16 +33,16 @@ public class SnapshotSaver {
      * @param issue
      * @param location
      */
-    public void SaveIssues(JiraApiProps api, String project, Issue issue, String location) {
+    public void SaveIssues(JiraApiProps api, String project, Issue issue, String location, Map<Issue, String> snapshotTicketsMap) {
         if (issue.getState() != IssueState.InUse) { return; }
 
         String nextLocation = location + issue.getKey() + "/" ;
         if (issue.hasSubIssues()) {
             for (Issue subIssue : issue) {
-                SaveIssues(api, project, subIssue, nextLocation);
+                SaveIssues(api, project, subIssue, nextLocation, snapshotTicketsMap);
             }
         } else if(issue instanceof UrlIssue) {
-            SaveSnapshot(api, project, (UrlIssue) issue, nextLocation);
+            SaveSnapshot(api, project, (UrlIssue) issue, nextLocation, snapshotTicketsMap);
         }
     }
 
@@ -51,7 +53,7 @@ public class SnapshotSaver {
      * @param issue
      * @param folder
      */
-    public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder) {
+    public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder, Map<Issue, String> snapshotTicketsMap) {
         String artifacts = AppLocations.ARTIFACTS + folder;
         String diff = AppLocations.DIFF + folder + AppLocations.DIFF_FILE;
 
@@ -82,6 +84,8 @@ public class SnapshotSaver {
             System.out.println(json);
             return;
         }
+
+        snapshotTicketsMap.put(issue, issueKey);
 
         for (File attachment : new File(artifacts).listFiles()) {
             JiraApi.createAttachment(api, issueKey, attachment);

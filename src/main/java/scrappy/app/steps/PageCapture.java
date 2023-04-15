@@ -1,4 +1,4 @@
-package scrappy.app;
+package scrappy.app.steps;
 
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;

@@ -73,9 +73,9 @@ public class DiffMatch {
 
             // find possible positions
             List<Route> newRoutes = Map.of(
-                Operation.DELETE, lastPos.across(),
-                Operation.INSERT, lastPos.down()
-            ).entrySet().stream()
+                    Operation.DELETE, lastPos.across(),
+                    Operation.INSERT, lastPos.down()
+                ).entrySet().stream()
                 // is valid position
                 .filter(entry -> isValidPosition(entry.getValue(), text1, text2))
                 .map(entry -> {
@@ -96,7 +96,7 @@ public class DiffMatch {
                     diffs.add(diff);
                     Route route = new Route(diffs, newPos);
                     return diagonaliseRoute(route, text1, text2);
-                }).collect(Collectors.toList());
+                }).toList();
 
             // check any route reach the end
             for (Route route: newRoutes) {
@@ -153,5 +153,50 @@ public class DiffMatch {
         String s1 = pos.oldTextIndex < text1.length ? text1[pos.oldTextIndex] : null;
         String s2 = pos.newTextIndex < text2.length ? text2[pos.newTextIndex] : null;
         return new String[]{ s1, s2 };
+    }
+
+    public List<Diff> summarise(List<Diff> diffs) {
+        List<Diff> summary = new ArrayList<>();
+        List<Diff> deleteStream = new ArrayList<>();
+        List<Diff> insertStream = new ArrayList<>();
+
+        // create delete and insert stream
+        for (Diff diff: diffs) {
+            if (diff.text.isEmpty()) {
+                continue;
+            }
+
+            switch (diff.operation()) {
+                case DELETE:
+                    deleteStream.add(diff);
+                    break;
+                case INSERT:
+                    insertStream.add(diff);
+                    break;
+                case EQUAL:
+                    summariseStreams(summary, deleteStream, insertStream);
+                    summary.add(diff);
+                    break;
+            }
+        }
+        summariseStreams(summary, deleteStream, insertStream);
+        return summary;
+    }
+
+    private void summariseStreams(List<Diff> summary, List<Diff> deleteStream, List<Diff> insertStream) {
+        if(!deleteStream.isEmpty()) {
+            String dtext = "";
+            for (Diff ddiff : deleteStream) {
+                dtext += ddiff.text();
+            }
+            summary.add(new Diff(Operation.DELETE, dtext));
+        }
+        if(!insertStream.isEmpty()) {
+            String itext = "";
+            for (Diff idiff : insertStream) {
+                itext += idiff.text();
+            }
+            summary.add(new Diff(Operation.INSERT, itext));
+        }
     }
 }
