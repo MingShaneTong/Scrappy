@@ -1,4 +1,4 @@
 package scrappy.jira;
 
-public record JiraApiProps(String apiUrl, String login, String apiToken) {
+public record JiraApiProps(JiraApiUrl apiUrl, String login, String apiToken) {
 }

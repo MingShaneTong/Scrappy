@@ -102,7 +102,7 @@ public class DiffMatch {
             for (Route route: newRoutes) {
                 routeQueue.add(route);
                 if (route.lastPos.equals(endPos)) {
-                    return route.diffs();
+                    return summarise(route.diffs());
                 }
             }
         }
@@ -176,6 +176,8 @@ public class DiffMatch {
                 case EQUAL:
                     summariseStreams(summary, deleteStream, insertStream);
                     summary.add(diff);
+                    deleteStream.clear();
+                    insertStream.clear();
                     break;
             }
         }

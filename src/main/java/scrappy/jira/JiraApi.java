@@ -19,7 +19,7 @@ public class JiraApi {
      * @return Json body of the Jira Issue
      */
     public static JSONObject getIssue(JiraApiProps api, String issueKey) {
-        String url = api.apiUrl() + issueKey;
+        String url = api.apiUrl().issueUrl(issueKey);
         try {
             HttpResponse<JsonNode> response = Unirest.get(url)
                 .basicAuth(api.login(), api.apiToken())
@@ -38,7 +38,7 @@ public class JiraApi {
      */
     public static JSONObject createIssue(JiraApiProps api, String issueJson) {
         try {
-            HttpResponse<JsonNode> response = Unirest.post(api.apiUrl())
+            HttpResponse<JsonNode> response = Unirest.post(api.apiUrl().issueUrl())
                 .basicAuth(api.login(), api.apiToken())
                 .header("Content-type", "application/json")
                 .body(issueJson)
@@ -57,7 +57,7 @@ public class JiraApi {
      * @return Json response from REST Api
      */
     public static JSONObject createAttachment(JiraApiProps api, String issueKey, File file) {
-        String url = api.apiUrl() + issueKey + "/attachments";
+        String url = api.apiUrl().attachmentUrl(issueKey);
         try {
             HttpResponse<JsonNode> response = Unirest.post(url)
                 .basicAuth(api.login(), api.apiToken())
