@@ -46,7 +46,6 @@ public class DiffDetector {
 
             DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffSize.WORD);
             List<DiffMatch.Diff> diffs = diffMatch.findDiffs(archiveStr, artifactsStr);
-            diffs = diffMatch.summarise(diffs);
             String diffString = diffToAdf(diffs);
 
             Files.createDirectories(diff.getParent());
