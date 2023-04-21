@@ -8,6 +8,7 @@ import scrappy.app.steps.SummarySaver;
 import scrappy.core.issue.types.ExecutionIssue;
 import scrappy.core.issue.types.Issue;
 import scrappy.jira.JiraApiProps;
+import scrappy.jira.JiraApiUrl;
 import scrappy.jira.JiraIssues;
 import scrappy.web.ScrappyPage;
 
@@ -43,7 +44,7 @@ public class App {
     }
 
     public void start() {
-        JiraApiProps api = new JiraApiProps(url + "/rest/api/3/issue/", login, apiToken);
+        JiraApiProps api = new JiraApiProps(new JiraApiUrl(url), login, apiToken);
 
         // get jira data
         System.out.println("Collecting Jira Data...");
@@ -77,7 +78,7 @@ public class App {
         // create summary
         System.out.println("Documenting summary on Jira...");
         SummarySaver sumSaver = new SummarySaver();
-        String sumkey = sumSaver.createSummary(api, project, exe, url, diffMap, snapshotTicketsMap);
+        String sumkey = sumSaver.createSummary(api, project, exe, diffMap, snapshotTicketsMap);
         System.out.println("Summary created on " + sumkey);
     }
 

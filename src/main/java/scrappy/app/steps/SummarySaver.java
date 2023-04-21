@@ -19,11 +19,11 @@ import java.util.Map;
 public class SummarySaver {
     private static final DateTimeFormatter TIMEFORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
-    public String createSummary(JiraApiProps apiProps, String project, Issue exe, String url, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
+    public String createSummary(JiraApiProps apiProps, String project, Issue exe, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
         String time = TIMEFORMATTER.format(LocalDateTime.now());
         String summary = String.format("%s %s", time, exe.getSummary());
         String description = SummaryDescriptionBuilder.createBulletListAdf(
-            createSummaryDescription(url, exe, diffMap, snapshotTicketsMap)
+            createSummaryDescription(apiProps.apiUrl().browseUrl(), exe, diffMap, snapshotTicketsMap)
         );
         String summaryJson = new SummaryIssueBuilder()
             .setProject(project)
@@ -42,16 +42,16 @@ public class SummarySaver {
         }
     }
 
-    public String createSummaryDescription(String url, Issue issue, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
+    public String createSummaryDescription(String browseUrl, Issue issue, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
         if (issue.getState() != IssueState.InUse) { return ""; }
 
         if (issue.hasSubIssues()) {
             List<String> items = new ArrayList<>();
             for (Issue subIssue: issue) {
-                items.add(createSummaryDescription(url, subIssue, diffMap, snapshotTicketsMap));
+                items.add(createSummaryDescription(browseUrl, subIssue, diffMap, snapshotTicketsMap));
             }
             String sublist = SummaryDescriptionBuilder.createBulletListAdf(String.join(",", items));
-            String label = createLinkItemParagraph(url + "/browse/" + issue.getKey(), false);
+            String label = createLinkItemParagraph(browseUrl + issue.getKey(), false);
             return SummaryDescriptionBuilder.createListItemAdf(label + "," + sublist);
         } else if (issue instanceof UrlIssue) {
             String snapshotIssue = snapshotTicketsMap.get(issue);
@@ -59,7 +59,7 @@ public class SummarySaver {
                 return "";
             }
             boolean diffIncluded = diffMap.get(issue);
-            String link = createLinkItemParagraph(url + "/browse/" + snapshotIssue, diffIncluded);
+            String link = createLinkItemParagraph(browseUrl + snapshotIssue, diffIncluded);
             return SummaryDescriptionBuilder.createListItemAdf(link);
         }
         return "";
