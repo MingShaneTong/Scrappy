@@ -1,5 +1,8 @@
 package scrappy.app;
 
+/**
+ * Locations to place files in
+ */
 public class AppLocations {
     public static final String ARTIFACTS = "artifacts/";
     public static final String ARCHIVE  = "archive/";

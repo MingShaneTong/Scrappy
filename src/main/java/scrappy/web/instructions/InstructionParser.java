@@ -11,45 +11,52 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+/**
+ * Parses instructions into an Instruction Node
+ */
 public class InstructionParser {
-    public static String require(Pattern p, String message, Scanner s) {
+    private static void require(Pattern p, String message, Scanner s) {
         if (s.hasNext(p)) {
-            return s.next();
+            s.next();
         }
         fail(message, s);
-        return null;
     }
 
-    public static void fail(String message, Scanner s) {
-        String msg = message + "\n   @ ...";
+    private static void fail(String message, Scanner s) {
+        StringBuilder msg = new StringBuilder(message + "\n   @ ...");
         for (int i = 0; i < 5 && s.hasNext(); i++) {
-            msg += " " + s.next();
+            msg.append(" ").append(s.next());
         }
         throw new RuntimeException(msg + "...");
     }
 
-    public static final Pattern STMTPAT = Pattern.compile("//|Visit|Click|WaitFor|Screenshot|Capture|For Each");
-    public static final Pattern COMMENTPAT = Pattern.compile("//");
-    public static final Pattern VISITPAT = Pattern.compile("Visit");
-    public static final Pattern CLICKPAT = Pattern.compile("Click");
-    public static final Pattern WAITFORPAT = Pattern.compile("WaitFor");
-    public static final Pattern SCREENSHOTPAT = Pattern.compile("Screenshot");
-    public static final Pattern CAPTUREPAT = Pattern.compile("Capture");
-    public static final Pattern FOREACHPAT = Pattern.compile("ForEach");
-    public static final Pattern HTMLPAT = Pattern.compile("HTML");
-    public static final Pattern TEXTCONTENTPAT = Pattern.compile("TextContent");
+    private static final Pattern STMTPAT = Pattern.compile("//|Visit|Click|WaitFor|Screenshot|Capture");
+    private static final Pattern COMMENTPAT = Pattern.compile("//");
+    private static final Pattern VISITPAT = Pattern.compile("Visit");
+    private static final Pattern CLICKPAT = Pattern.compile("Click");
+    private static final Pattern WAITFORPAT = Pattern.compile("WaitFor");
+    private static final Pattern SCREENSHOTPAT = Pattern.compile("Screenshot");
+    private static final Pattern CAPTUREPAT = Pattern.compile("Capture");
 
-    public static final Pattern OPENPAREN = Pattern.compile("\\(");
-    public static final Pattern CLOSEPAREN = Pattern.compile("\\)");
+    private static final Pattern HTMLPAT = Pattern.compile("HTML");
+    private static final Pattern TEXTCONTENTPAT = Pattern.compile("TextContent");
 
-    public static final Pattern WITH = Pattern.compile("with");
-    public static final Pattern AS = Pattern.compile("as");
-    public static final Pattern FROM = Pattern.compile("from");
-    public static final Pattern TO = Pattern.compile("to");
-    public static final Pattern FILE = Pattern.compile("file");
+    private static final Pattern OPENPAREN = Pattern.compile("\\(");
+    private static final Pattern CLOSEPAREN = Pattern.compile("\\)");
 
-    public static final Pattern SELECTOR = Pattern.compile("selector");    public static final Pattern SEMICOLON = Pattern.compile(";");
+    private static final Pattern WITH = Pattern.compile("with");
+    private static final Pattern AS = Pattern.compile("as");
+    private static final Pattern FROM = Pattern.compile("from");
+    private static final Pattern TO = Pattern.compile("to");
+    private static final Pattern FILE = Pattern.compile("file");
+    private static final Pattern SELECTOR = Pattern.compile("selector");
+    private static final Pattern SEMICOLON = Pattern.compile(";");
 
+    /**
+     * Parses the instruction to node
+     * @param instructions instruction to parse
+     * @return instruction node
+     */
     public static IInstructionNode parse(String instructions) {
         Scanner scanner = new Scanner(instructions).useDelimiter("\\s+|(?=[{}(),;])|(?<=[{}(),;])");
         IInstructionNode node = parseProgram(scanner);
@@ -57,6 +64,11 @@ public class InstructionParser {
         return node;
     }
 
+    /**
+     * Parses file to instruction node
+     * @param file file with instruction to parse
+     * @return instruction node
+     */
     public static IInstructionNode parseFile(String file) {
         Scanner scanner;
         try {
@@ -69,7 +81,7 @@ public class InstructionParser {
         return node;
     }
 
-    public static IInstructionNode parseProgram(Scanner scanner) {
+    private static IInstructionNode parseProgram(Scanner scanner) {
         List<IInstructionNode> instructions = new ArrayList<>();
         while (scanner.hasNext(STMTPAT)) {
             instructions.add(parseStmt(scanner));
@@ -77,7 +89,7 @@ public class InstructionParser {
         return new ProgramNode(instructions);
     }
 
-    public static IInstructionNode parseStmt(Scanner scanner) {
+    private static IInstructionNode parseStmt(Scanner scanner) {
         IInstructionNode node = null;
         if (scanner.hasNext(COMMENTPAT)){
             node = parseComment(scanner);
@@ -91,44 +103,42 @@ public class InstructionParser {
             node = parseScreenshot(scanner);
         } else if (scanner.hasNext(CAPTUREPAT)) {
             node = parseCapture(scanner);
-        } else if (scanner.hasNext(FOREACHPAT)) {
-
         } else {
             fail("STMT not supported", scanner);
         }
         return node;
     }
 
-    public static IInstructionNode parseComment(Scanner scanner) {
+    private static IInstructionNode parseComment(Scanner scanner) {
         require(COMMENTPAT, "'//' is required", scanner);
-        while (scanner.hasNext(SEMICOLON) == false) {
+        while (!scanner.hasNext(SEMICOLON)) {
             scanner.next();
         }
         require(SEMICOLON, "';' is required", scanner);
         return new CommentNode();
     }
 
-    public static IInstructionNode parseVisit(Scanner scanner) {
+    private static IInstructionNode parseVisit(Scanner scanner) {
         require(VISITPAT, "'Visit' is required", scanner);
         String url = parseBracketString(scanner);
         require(SEMICOLON, "';' is required", scanner);
         return new VisitNode(url);
     }
 
-    public static IInstructionNode parseClick(Scanner scanner) {
+    private static IInstructionNode parseClick(Scanner scanner) {
         require(CLICKPAT, "'Click' is required", scanner);
         Selector selector = parseSelector(scanner);
         require(SEMICOLON, "';' is required", scanner);
         return new ClickNode(selector);
     }
 
-    public static IInstructionNode parseWaitFor(Scanner scanner) {
+    private static IInstructionNode parseWaitFor(Scanner scanner) {
         require(WAITFORPAT, "'WaitFor' is required", scanner);
         Selector selector = parseSelector(scanner);
         require(SEMICOLON, "';' is required", scanner);
         return new WaitForNode(selector);
     }
-    public static IInstructionNode parseScreenshot(Scanner scanner) {
+    private static IInstructionNode parseScreenshot(Scanner scanner) {
         require(SCREENSHOTPAT, "'Screenshot' is required", scanner);
         Selector selector = parseSelector(scanner);
         require(AS, "'as' is required", scanner);
@@ -138,7 +148,7 @@ public class InstructionParser {
         return new ScreenshotNode(selector, file);
     }
 
-    public static IInstructionNode parseCapture(Scanner scanner) {
+    private static IInstructionNode parseCapture(Scanner scanner) {
         require(CAPTUREPAT, "'Capture' is required", scanner);
         CaptureType type;
         if (scanner.hasNext(HTMLPAT)) {
@@ -160,7 +170,7 @@ public class InstructionParser {
         return new CaptureNode(type, selector, file);
     }
 
-    public static Selector parseSelector(Scanner scanner) {
+    private static Selector parseSelector(Scanner scanner) {
         String description = parseBracketString(scanner);
         require(WITH, "'with' is required", scanner);
         require(SELECTOR, "'selector' is required", scanner);
@@ -168,10 +178,10 @@ public class InstructionParser {
         return new Selector(description, selector);
     }
 
-    public static String parseBracketString(Scanner scanner) {
+    private static String parseBracketString(Scanner scanner) {
         require(OPENPAREN, "'(' is required", scanner);
         List<String> description = new ArrayList<>();
-        while (scanner.hasNext(CLOSEPAREN) == false) {
+        while (!scanner.hasNext(CLOSEPAREN)) {
             description.add(scanner.next());
         }
         require(CLOSEPAREN, "')' is required", scanner);

@@ -5,6 +5,10 @@ import scrappy.web.instructions.Variables;
 
 import java.util.List;
 
+/**
+ * Contains instructions to execute
+ * @param instructions Instruction node to execute
+ */
 public record ProgramNode(List<IInstructionNode> instructions) implements IInstructionNode {
     @Override
     public void apply(Page page, Variables var) {

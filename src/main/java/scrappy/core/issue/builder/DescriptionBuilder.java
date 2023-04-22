@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Constructs Description to Atlassian Document Format
+ */
 public class DescriptionBuilder {
 
     private static final String deleteAdf;

@@ -16,6 +16,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Main application
+ */
 public class App {
     private final String url;
     private final String project;
@@ -23,6 +26,14 @@ public class App {
     private final String apiToken;
     private final String executionJira;
 
+    /**
+     * Creates an app
+     * @param url Base url of Jira
+     * @param project Project Code
+     * @param login Username to login
+     * @param apiToken Api Token for username
+     * @param executionJira Execution Jira issue key
+     */
     public App(String url, String project, String login, String apiToken, String executionJira) {
         this.url = url;
         this.project = project;
@@ -31,7 +42,7 @@ public class App {
         this.executionJira = executionJira;
     }
 
-    public static void deleteDirectory(File file) {
+    private static void deleteDirectory(File file) {
         if (!file.exists()) { return; }
 
         for (File subfile : file.listFiles()) {
@@ -43,6 +54,15 @@ public class App {
         file.delete();
     }
 
+    /**
+     * Performs the steps
+     * - Data collection
+     * - Reset Artifacts
+     * - Capturing Artifacts
+     * - Check for differences
+     * - Documenting artifacts
+     * - Document summary
+     */
     public void start() {
         JiraApiProps api = new JiraApiProps(new JiraApiUrl(url), login, apiToken);
 
@@ -82,6 +102,10 @@ public class App {
         System.out.println("Summary created on " + sumkey);
     }
 
+    /**
+     * Starts application
+     * @param args [baseUrl, projectCode, username, apiToken, Execution jira key]
+     */
     public static void main(String[] args) {
         String url = args[0];
         String project = args[1];

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
  * Builds a Snapshot issue Json to be in the body of the REST API Request
  */
 public class SnapshotIssueBuilder {
-    private static String formatString;
+    private static final String formatString;
 
     static {
         try {

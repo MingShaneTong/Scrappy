@@ -9,6 +9,12 @@ import scrappy.web.instructions.parameters.Selector;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Captures the text content of selector
+ * @param type Type of text to capture
+ * @param selector Selector reference to the HTML element
+ * @param file File to save content to
+ */
 public record CaptureNode(CaptureType type, Selector selector, String file) implements IInstructionNode {
     @Override
     public void apply(Page page, Variables var) {
