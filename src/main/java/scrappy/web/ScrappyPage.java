@@ -11,9 +11,9 @@ import scrappy.web.instructions.nodes.IInstructionNode;
  * Scraps data from the webpage
  */
 public class ScrappyPage {
-    private IInstructionNode defaultInstruction;
+    private static final IInstructionNode defaultInstruction;
 
-    public ScrappyPage() {
+    static {
         defaultInstruction = InstructionParser.parseFile("default.instruction");
     }
 

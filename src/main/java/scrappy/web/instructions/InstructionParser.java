@@ -12,30 +12,29 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class InstructionParser {
-    public static String require(Pattern p, String message, Scanner s) {
+    public static void require(Pattern p, String message, Scanner s) {
         if (s.hasNext(p)) {
-            return s.next();
+            s.next();
         }
         fail(message, s);
-        return null;
     }
 
     public static void fail(String message, Scanner s) {
-        String msg = message + "\n   @ ...";
+        StringBuilder msg = new StringBuilder(message + "\n   @ ...");
         for (int i = 0; i < 5 && s.hasNext(); i++) {
-            msg += " " + s.next();
+            msg.append(" ").append(s.next());
         }
         throw new RuntimeException(msg + "...");
     }
 
-    public static final Pattern STMTPAT = Pattern.compile("//|Visit|Click|WaitFor|Screenshot|Capture|For Each");
+    public static final Pattern STMTPAT = Pattern.compile("//|Visit|Click|WaitFor|Screenshot|Capture");
     public static final Pattern COMMENTPAT = Pattern.compile("//");
     public static final Pattern VISITPAT = Pattern.compile("Visit");
     public static final Pattern CLICKPAT = Pattern.compile("Click");
     public static final Pattern WAITFORPAT = Pattern.compile("WaitFor");
     public static final Pattern SCREENSHOTPAT = Pattern.compile("Screenshot");
     public static final Pattern CAPTUREPAT = Pattern.compile("Capture");
-    public static final Pattern FOREACHPAT = Pattern.compile("ForEach");
+
     public static final Pattern HTMLPAT = Pattern.compile("HTML");
     public static final Pattern TEXTCONTENTPAT = Pattern.compile("TextContent");
 
@@ -47,7 +46,6 @@ public class InstructionParser {
     public static final Pattern FROM = Pattern.compile("from");
     public static final Pattern TO = Pattern.compile("to");
     public static final Pattern FILE = Pattern.compile("file");
-
     public static final Pattern SELECTOR = Pattern.compile("selector");    public static final Pattern SEMICOLON = Pattern.compile(";");
 
     public static IInstructionNode parse(String instructions) {
@@ -91,8 +89,6 @@ public class InstructionParser {
             node = parseScreenshot(scanner);
         } else if (scanner.hasNext(CAPTUREPAT)) {
             node = parseCapture(scanner);
-        } else if (scanner.hasNext(FOREACHPAT)) {
-
         } else {
             fail("STMT not supported", scanner);
         }
@@ -101,7 +97,7 @@ public class InstructionParser {
 
     public static IInstructionNode parseComment(Scanner scanner) {
         require(COMMENTPAT, "'//' is required", scanner);
-        while (scanner.hasNext(SEMICOLON) == false) {
+        while (!scanner.hasNext(SEMICOLON)) {
             scanner.next();
         }
         require(SEMICOLON, "';' is required", scanner);
@@ -171,7 +167,7 @@ public class InstructionParser {
     public static String parseBracketString(Scanner scanner) {
         require(OPENPAREN, "'(' is required", scanner);
         List<String> description = new ArrayList<>();
-        while (scanner.hasNext(CLOSEPAREN) == false) {
+        while (!scanner.hasNext(CLOSEPAREN)) {
             description.add(scanner.next());
         }
         require(CLOSEPAREN, "')' is required", scanner);

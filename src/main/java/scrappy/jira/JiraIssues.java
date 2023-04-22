@@ -84,7 +84,7 @@ public class JiraIssues {
             case Folder:
                 return getFolderIssue(json, api, issueKey);
             case Url:
-                return getUrlIssue(json, api, issueKey);
+                return getUrlIssue(json, issueKey);
             case Execution:
             default:
                 throw new RuntimeException("SubIssue Type not supported");
@@ -131,11 +131,10 @@ public class JiraIssues {
     /**
      * Returns Url issue.
      * @param json
-     * @param api
      * @param issueKey
      * @return
      */
-    private static UrlIssue getUrlIssue(JSONObject json, JiraApiProps api, String issueKey) {
+    private static UrlIssue getUrlIssue(JSONObject json, String issueKey) {
         // collect field
         JSONObject fields = json.getJSONObject("fields");
         String summary = fields.getString("summary");

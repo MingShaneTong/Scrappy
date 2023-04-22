@@ -1,16 +1,32 @@
 package scrappy.core.diff;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class DiffMatch {
+    /**
+     * Represents a type of operation on the text
+     */
     public enum Operation {
         DELETE, INSERT, EQUAL
     }
 
-    public enum DiffSize {
-        CHARACTER, WORD, LINE
+    /**
+     *
+     */
+    public enum DiffDelimiter {
+        CHARACTER(""),
+        WORD(" "),
+        LINE("\n");
+
+        private final String delimiter;
+
+        DiffDelimiter(String delimiter) {
+            this.delimiter = delimiter;
+        }
+
+        public String delimiter() {
+            return this.delimiter;
+        }
     }
 
     public record Diff(Operation operation, String text) { }
@@ -35,25 +51,15 @@ public class DiffMatch {
         }
     }
 
-    private final String delimiter;
+    private final DiffDelimiter delimiter;
 
-    public DiffMatch(DiffSize size) {
-        switch (size) {
-            case CHARACTER:
-                delimiter = "";
-                break;
-            case WORD:
-                delimiter = " ";
-                break;
-            default:
-                delimiter = "\n";
-                break;
-        }
+    public DiffMatch(DiffDelimiter delimiter) {
+        this.delimiter = delimiter;
     }
 
     public List<Diff> findDiffs(String text1, String text2) {
-        String[] split1 = text1.split(delimiter);
-        String[] split2 = text2.split(delimiter);
+        String[] split1 = text1.split(delimiter.delimiter());
+        String[] split2 = text2.split(delimiter.delimiter());
         return findDiffs(split1, split2);
     }
 
@@ -111,7 +117,7 @@ public class DiffMatch {
 
     private String getTextBetween(String[] text, int a, int b) {
         String[] textArray = Arrays.copyOfRange(text, a, b);
-        return String.join(delimiter, textArray);
+        return String.join(delimiter.delimiter(), textArray);
     }
 
     private Queue<Route> initialiseRoutes(String[] text1, String[] text2) {
@@ -187,18 +193,18 @@ public class DiffMatch {
 
     private void summariseStreams(List<Diff> summary, List<Diff> deleteStream, List<Diff> insertStream) {
         if(!deleteStream.isEmpty()) {
-            String dtext = "";
-            for (Diff ddiff : deleteStream) {
-                dtext += ddiff.text();
+            StringBuilder deleteText = new StringBuilder();
+            for (Diff diff : deleteStream) {
+                deleteText.append(diff.text());
             }
-            summary.add(new Diff(Operation.DELETE, dtext));
+            summary.add(new Diff(Operation.DELETE, deleteText.toString()));
         }
         if(!insertStream.isEmpty()) {
-            String itext = "";
-            for (Diff idiff : insertStream) {
-                itext += idiff.text();
+            StringBuilder insertText = new StringBuilder();
+            for (Diff diff : insertStream) {
+                insertText.append(diff.text());
             }
-            summary.add(new Diff(Operation.INSERT, itext));
+            summary.add(new Diff(Operation.INSERT, insertText.toString()));
         }
     }
 }
