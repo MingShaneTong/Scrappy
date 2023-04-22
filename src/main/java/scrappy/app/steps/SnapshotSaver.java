@@ -28,10 +28,11 @@ public class SnapshotSaver {
 
     /**
      * Create tickets for the snapshot that was captured for a run
-     * @param api
-     * @param project
-     * @param issue
-     * @param location
+     * @param api Jira REST Api Properties
+     * @param project Project Code
+     * @param issue Issue to save
+     * @param location location in artifacts
+     * @param snapshotTicketsMap Stores UrlIssue to newly created SnapshotIssue
      */
     public void SaveIssues(JiraApiProps api, String project, Issue issue, String location, Map<Issue, String> snapshotTicketsMap) {
         if (issue.getState() != IssueState.InUse) { return; }
@@ -48,10 +49,11 @@ public class SnapshotSaver {
 
     /**
      * Creates a Snapshot Issue and add attachment files in folder to it.
-     * @param api
-     * @param project
-     * @param issue
-     * @param folder
+     * @param api Jira REST Api Properties
+     * @param project Project Code
+     * @param issue Issue to save
+     * @param folder location in artifacts
+     * @param snapshotTicketsMap Stores UrlIssue to newly created SnapshotIssue
      */
     public void SaveSnapshot(JiraApiProps api, String project, UrlIssue issue, String folder, Map<Issue, String> snapshotTicketsMap) {
         String artifacts = AppLocations.ARTIFACTS + folder;

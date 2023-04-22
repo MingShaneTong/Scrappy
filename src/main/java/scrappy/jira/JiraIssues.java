@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * Retrieves and parses issues from the api
+ */
 public class JiraIssues {
     private static final String CONTAINS = "Contains";
     private static final String URLFIELD = "customfield_10035";
@@ -25,9 +28,9 @@ public class JiraIssues {
 
     /**
      * Returns Execution issue and its sub-issues.
-     * @param api
-     * @param issueKey
-     * @return
+     * @param api Jira REST Api Properties
+     * @param issueKey Issue to retrieve
+     * @return Execution Issue Object
      */
     public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) {
         JSONObject json = JiraApi.getIssue(api, issueKey);
@@ -69,9 +72,9 @@ public class JiraIssues {
 
     /**
      * Returns folder or url issue
-     * @param api
-     * @param issueKey
-     * @return
+     * @param api Jira REST Api Properties
+     * @param issueKey Issue to retrieve
+     * @return Execution Issue Object
      */
     public static Issue getSubIssue(JiraApiProps api, String issueKey) {
         JSONObject json = JiraApi.getIssue(api, issueKey);
@@ -93,10 +96,10 @@ public class JiraIssues {
 
     /**
      * Returns folder issue and its sub-issues.
-     * @param json
-     * @param api
-     * @param issueKey
-     * @return
+     * @param json json object to parse
+     * @param api Jira REST Api Properties
+     * @param issueKey Issue to retrieve
+     * @return Execution Issue Object
      */
     private static FolderIssue getFolderIssue(JSONObject json, JiraApiProps api, String issueKey) {
         // collect field
@@ -130,9 +133,9 @@ public class JiraIssues {
 
     /**
      * Returns Url issue.
-     * @param json
-     * @param issueKey
-     * @return
+     * @param json json object to parse
+     * @param issueKey Issue to retrieve
+     * @return Execution Issue Object
      */
     private static UrlIssue getUrlIssue(JSONObject json, String issueKey) {
         // collect field

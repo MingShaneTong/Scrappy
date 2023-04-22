@@ -19,9 +19,9 @@ public class ScrappyPage {
 
     /**
      * Captures data based on instructions
-     * @param url
-     * @param instructions
-     * @param location
+     * @param url Base url of the page
+     * @param instructions instructions to parse and follow
+     * @param location file location to save artifacts
      */
     public void capture(String url, String instructions, String location) {
         try (Playwright playwright = Playwright.create()) {

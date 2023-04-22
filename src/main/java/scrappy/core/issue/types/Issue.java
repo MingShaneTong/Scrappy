@@ -12,6 +12,13 @@ public abstract class Issue implements Iterable<Issue> {
     private final IssueState state;
     private final List<Issue> subIssues;
 
+    /**
+     * Creates an issue
+     * @param key jira key of issue
+     * @param summary Title of the issue
+     * @param state Whether the issue is in use or not
+     * @param subIssues The issues contained in the issue
+     */
     public Issue(String key, String summary, IssueState state, List<Issue> subIssues) {
         this.key = key;
         this.summary = summary;
@@ -31,13 +38,17 @@ public abstract class Issue implements Iterable<Issue> {
         return state;
     }
 
+    /**
+     * Checks if the issue has sub issues
+     * @return True if issue has sub issues
+     */
     public boolean hasSubIssues() {
         return !subIssues.isEmpty();
     }
 
     /**
      * Iterates through each of the sub issues.
-     * @return
+     * @return Iterator for each sub issue
      */
     public Iterator<Issue> iterator() {
         return subIssues.iterator();
@@ -45,7 +56,7 @@ public abstract class Issue implements Iterable<Issue> {
 
     /**
      * Return issue tree string starting as the root.
-     * @return
+     * @return issue string represented as a tree
      */
     public String printTree() {
         return printTree(0, "");
@@ -53,7 +64,9 @@ public abstract class Issue implements Iterable<Issue> {
 
     /**
      * Returns issue tree continuing from depth 'tabs'.
-     * @return
+     * @param tabs Number of indentations into the tree
+     * @param current Current string to append to
+     * @return issue string represented as a tree
      */
     public String printTree(int tabs, String current) {
         String newStr = current;

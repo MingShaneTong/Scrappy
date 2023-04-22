@@ -14,8 +14,8 @@ import java.io.File;
 public class JiraApi {
     /**
      * Retrieves issue from Jira
-     * @param api
-     * @param issueKey
+     * @param api Jira REST Api properties
+     * @param issueKey Issue key to retrieve
      * @return Json body of the Jira Issue
      */
     public static JSONObject getIssue(JiraApiProps api, String issueKey) {
@@ -32,8 +32,8 @@ public class JiraApi {
 
     /**
      * Creates an issue with the provided json data
-     * @param api
-     * @param issueJson
+     * @param api Jira REST Api properties
+     * @param issueJson Issue Json Object to post to api
      * @return Json response from REST Api
      */
     public static JSONObject createIssue(JiraApiProps api, String issueJson) {
@@ -51,9 +51,9 @@ public class JiraApi {
 
     /**
      * Attaches file to the Jira issue
-     * @param api
-     * @param issueKey
-     * @param file
+     * @param api Jira REST Api properties
+     * @param issueKey Issue key to create attachment for
+     * @param file File to attach to issue
      * @return Json response from REST Api
      */
     public static JSONObject createAttachment(JiraApiProps api, String issueKey, File file) {
