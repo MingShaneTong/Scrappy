@@ -6,6 +6,11 @@ import scrappy.core.issue.types.IssueState;
  * Parses the issue state from a string
  */
 public class IssueStateParser {
+    /**
+     * Safely parses the string to issue state
+     * @param state State string to parse
+     * @return Parsed IssueState or null if not a type
+     */
     public static IssueState tryParse(String state) {
         try {
             return parse(state);
@@ -14,7 +19,12 @@ public class IssueStateParser {
         }
     }
 
-    public static IssueState parse(String state) throws Exception {
+    /**
+     * Parses the string to issue state
+     * @param state State string to parse
+     * @return Parsed IssueState or null if not a type
+     */
+    public static IssueState parse(String state) {
         switch (state) {
             case "In Use":
                 return IssueState.InUse;
@@ -23,7 +33,7 @@ public class IssueStateParser {
             case "Not In Use":
                 return IssueState.NotInUse;
             default:
-                throw new Exception("Issue State Not Supported.");
+                throw new RuntimeException("Issue State Not Supported.");
         }
     }
 }

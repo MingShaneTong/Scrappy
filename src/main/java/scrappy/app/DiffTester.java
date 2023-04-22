@@ -2,6 +2,7 @@ package scrappy.app;
 
 import scrappy.core.diff.DiffMatch;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -9,7 +10,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Tests the diff algorithm
+ */
 public class DiffTester {
+    /**
+     * @param args [file 1, file 2] to test the diff algorithm on
+     * @throws FileNotFoundException Throws exception if file does not exist
+     */
     public static void main(String[] args) throws IOException {
         String file1 = args[0];
         String file2 = args[1];
