@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Creates a description for a summary issue
+ */
 public class SummaryDescriptionBuilder {
     private static final String diffFoundAdf;
     private static final String inlineCardAdf;

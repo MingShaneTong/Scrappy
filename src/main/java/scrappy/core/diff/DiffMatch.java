@@ -2,6 +2,9 @@ package scrappy.core.diff;
 
 import java.util.*;
 
+/**
+ * Detects differences between 2 sets of text
+ */
 public class DiffMatch {
     /**
      * Represents a type of operation on the text
@@ -11,7 +14,7 @@ public class DiffMatch {
     }
 
     /**
-     *
+     * Delimiter to split text on
      */
     public enum DiffDelimiter {
         CHARACTER(""),
@@ -24,14 +27,23 @@ public class DiffMatch {
             this.delimiter = delimiter;
         }
 
+        /**
+         * Converts to the delimiter string
+         * @return delimiter string
+         */
         public String delimiter() {
             return this.delimiter;
         }
     }
 
+    /**
+     * Represents a change made to the text
+     * @param operation operation performed on text
+     * @param text text change made
+     */
     public record Diff(Operation operation, String text) { }
 
-    public record Position(int oldTextIndex, int newTextIndex) {
+    private record Position(int oldTextIndex, int newTextIndex) {
         public Position across() {
             return new Position(oldTextIndex + 1, newTextIndex);
         }
@@ -45,7 +57,7 @@ public class DiffMatch {
         }
     }
 
-    public record Route(List<Diff> diffs, Position lastPos) {
+    private record Route(List<Diff> diffs, Position lastPos) {
         public boolean isComplete(Position end) {
             return lastPos.equals(end);
         }
@@ -53,16 +65,32 @@ public class DiffMatch {
 
     private final DiffDelimiter delimiter;
 
+    /**
+     * Creates a diff match instance
+     * @param delimiter delimiter to split text on
+     */
     public DiffMatch(DiffDelimiter delimiter) {
         this.delimiter = delimiter;
     }
 
+    /**
+     * Finds difference between text on delimiter
+     * @param text1 Original Text
+     * @param text2 New Text
+     * @return List of differences done
+     */
     public List<Diff> findDiffs(String text1, String text2) {
         String[] split1 = text1.split(delimiter.delimiter());
         String[] split2 = text2.split(delimiter.delimiter());
         return findDiffs(split1, split2);
     }
 
+    /**
+     * Finds difference between text
+     * @param text1 Original Text
+     * @param text2 New Text
+     * @return List of differences done
+     */
     public List<Diff> findDiffs(String[] text1, String[] text2) {
         Queue<Route> routeQueue = initialiseRoutes(text1, text2);
         Position endPos = new Position(text1.length, text2.length);
@@ -161,7 +189,7 @@ public class DiffMatch {
         return new String[]{ s1, s2 };
     }
 
-    public List<Diff> summarise(List<Diff> diffs) {
+    private List<Diff> summarise(List<Diff> diffs) {
         List<Diff> summary = new ArrayList<>();
         List<Diff> deleteStream = new ArrayList<>();
         List<Diff> insertStream = new ArrayList<>();

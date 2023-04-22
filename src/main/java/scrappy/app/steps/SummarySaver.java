@@ -16,9 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Creates Summary Issues
+ */
 public class SummarySaver {
     private static final DateTimeFormatter TIMEFORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
+    /**
+     * Creates a summary issue
+     * @param apiProps Jira REST API Properties
+     * @param project Project String
+     * @param exe Execution issue
+     * @param diffMap Map to check if issue key has had a difference
+     * @param snapshotTicketsMap Map from Issue key to created snapshot issue
+     * @return Issue Key of summary Issue
+     */
     public String createSummary(JiraApiProps apiProps, String project, Issue exe, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
         String time = TIMEFORMATTER.format(LocalDateTime.now());
         String summary = String.format("%s %s", time, exe.getSummary());
@@ -42,7 +54,7 @@ public class SummarySaver {
         }
     }
 
-    public String createSummaryDescription(String browseUrl, Issue issue, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
+    private String createSummaryDescription(String browseUrl, Issue issue, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
         if (issue.getState() != IssueState.InUse) { return ""; }
 
         if (issue.hasSubIssues()) {

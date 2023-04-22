@@ -15,12 +15,21 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Detects differences between the files
+ */
 public class DiffDetector {
+    /**
+     * Checks for differences since the last execution
+     * @param issue Execution Issue to check
+     * @param diffMap issue to boolean for differences detected
+     * @return Difference has been detected
+     */
     public boolean detectDifferences(Issue issue, Map<Issue, Boolean> diffMap) {
         return detectDifferences(issue, "", diffMap);
     }
 
-    public boolean detectDifferences(Issue issue, String location, Map<Issue, Boolean> diffMap) {
+    private boolean detectDifferences(Issue issue, String location, Map<Issue, Boolean> diffMap) {
         if (issue.getState() != IssueState.InUse) { return false; }
 
         String nextLocation = location + issue.getKey() + "/";
@@ -59,7 +68,7 @@ public class DiffDetector {
         }
     }
 
-    public String diffToAdf(List<DiffMatch.Diff> diffs) {
+    private String diffToAdf(List<DiffMatch.Diff> diffs) {
         List<List<DiffMatch.Diff>> changeGroups = new ArrayList<>();
         DiffMatch.Diff previous = null;
         List<DiffMatch.Diff> currentGroup = new ArrayList<>();
