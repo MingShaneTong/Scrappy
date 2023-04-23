@@ -1,11 +1,14 @@
 package scrappy.app.steps;
 
+import scrappy.app.AppLocations;
 import scrappy.core.issue.types.Issue;
 import scrappy.core.issue.types.IssueState;
 import scrappy.core.issue.types.UrlIssue;
 import scrappy.web.ScrappyPage;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,9 +42,15 @@ public class PageCapture {
             Files.createDirectories(path);
             UrlIssue urlIssue = (UrlIssue) issue;
             page.capture(urlIssue.getUrl(), urlIssue.getInstructions(), location);
-        } catch (IOException e) {
+        } catch (Exception exception) {
             System.out.println("Problem Capturing " + issue.getKey());
-            System.out.println(e);
+            System.out.println("Error: " + exception);
+            String stackTraceFile = location + AppLocations.STACK_TRACE_FILE;
+            try (PrintWriter writer = new PrintWriter(stackTraceFile)) {
+                exception.printStackTrace(writer);
+            } catch (IOException e) {
+                System.out.println("Saving Stack Trace Failure");
+            }
         }
     }
 }

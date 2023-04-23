@@ -9,4 +9,5 @@ public class AppLocations {
     public static final String MAIN_FILE = "main.txt";
     public static final String DIFF = "diff/";
     public static final String DIFF_FILE = "main.json";
+    public static final String STACK_TRACE_FILE = "stacktrace.txt";
 }

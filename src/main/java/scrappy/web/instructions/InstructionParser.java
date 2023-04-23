@@ -18,8 +18,9 @@ public class InstructionParser {
     private static void require(Pattern p, String message, Scanner s) {
         if (s.hasNext(p)) {
             s.next();
+        } else {
+            fail(message, s);
         }
-        fail(message, s);
     }
 
     private static void fail(String message, Scanner s) {
