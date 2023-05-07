@@ -1,5 +1,21 @@
 # Instructions
 
+## Grammar
+```text
+PRGM ::= [STMT]+
+STMT ::= CAPTURE | CLICK | COMMENT | SCREENSHOT | VISIT | WAITFOR ";"
+SELECTOR ::= BRACKETEDSTRING "with selector" BRACKETEDSTRING
+BRACKETEDSTRING ::= "(" [TEXT]+ ")"
+TEXT ::= .*
+CAPTURE ::= "Capture" CAPTURETYPE "from" SELECTOR "to file" BRACKETEDSTRING
+CAPTURETYPE ::= "HTML" | "TextContent"
+CLICK ::= "Click" SELECTOR
+COMMENT ::= "//" [TEXT]*
+SCREENSHOT ::= "Screenshot" SELECTOR "as file" BRACKETEDSTRING
+VISIT ::= "Visit" BRACKETEDSTRING
+WAITFOR ::= "WaitFor" SELECTOR ;
+```
+
 ## Parameters
 | Name         | Syntax                                      | Input                              | Description                               |
 |--------------|---------------------------------------------|------------------------------------|-------------------------------------------|
