@@ -107,6 +107,7 @@ public class InstructionParser {
         } else {
             fail("STMT not supported", scanner);
         }
+        require(SEMICOLON, "';' is required", scanner);
         return node;
     }
 
@@ -115,28 +116,24 @@ public class InstructionParser {
         while (!scanner.hasNext(SEMICOLON)) {
             scanner.next();
         }
-        require(SEMICOLON, "';' is required", scanner);
         return new CommentNode();
     }
 
     private static IInstructionNode parseVisit(Scanner scanner) {
         require(VISITPAT, "'Visit' is required", scanner);
         String url = parseBracketString(scanner);
-        require(SEMICOLON, "';' is required", scanner);
         return new VisitNode(url);
     }
 
     private static IInstructionNode parseClick(Scanner scanner) {
         require(CLICKPAT, "'Click' is required", scanner);
         Selector selector = parseSelector(scanner);
-        require(SEMICOLON, "';' is required", scanner);
         return new ClickNode(selector);
     }
 
     private static IInstructionNode parseWaitFor(Scanner scanner) {
         require(WAITFORPAT, "'WaitFor' is required", scanner);
         Selector selector = parseSelector(scanner);
-        require(SEMICOLON, "';' is required", scanner);
         return new WaitForNode(selector);
     }
     private static IInstructionNode parseScreenshot(Scanner scanner) {
@@ -145,7 +142,6 @@ public class InstructionParser {
         require(AS, "'as' is required", scanner);
         require(FILE, "'file' is required", scanner);
         String file = parseBracketString(scanner);
-        require(SEMICOLON, "';' is required", scanner);
         return new ScreenshotNode(selector, file);
     }
 
@@ -167,7 +163,6 @@ public class InstructionParser {
         require(TO, "'to' is required", scanner);
         require(FILE, "'file' is required", scanner);
         String file = parseBracketString(scanner);
-        require(SEMICOLON, "';' is required", scanner);
         return new CaptureNode(type, selector, file);
     }
 

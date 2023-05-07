@@ -1,7 +1,7 @@
 package scrappy.app.steps;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import scrappy.core.issue.builder.SummaryDescriptionBuilder;
 import scrappy.core.issue.builder.SummaryIssueBuilder;
 import scrappy.core.issue.types.Issue;

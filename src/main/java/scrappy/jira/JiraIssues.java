@@ -1,7 +1,7 @@
 package scrappy.jira;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 import scrappy.core.issue.parser.IssueStateParser;
 import scrappy.core.issue.parser.IssueTypeParser;
 import scrappy.core.issue.types.*;
