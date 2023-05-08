@@ -35,7 +35,7 @@ public class SnapshotSaver {
      * @param snapshotTicketsMap Stores UrlIssue to newly created SnapshotIssue
      */
     public void SaveIssues(JiraApiProps api, String project, Issue issue, String location, Map<Issue, String> snapshotTicketsMap) {
-        if (issue.getState() != IssueState.InUse) { return; }
+        if (issue.getState() == IssueState.Done) { return; }
 
         String nextLocation = location + issue.getKey() + "/" ;
         if (issue.hasSubIssues()) {

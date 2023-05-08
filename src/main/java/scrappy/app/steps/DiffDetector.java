@@ -30,7 +30,7 @@ public class DiffDetector {
     }
 
     private boolean detectDifferences(Issue issue, String location, Map<Issue, Boolean> diffMap) {
-        if (issue.getState() != IssueState.InUse) { return false; }
+        if (issue.getState() == IssueState.Done) { return false; }
 
         String nextLocation = location + issue.getKey() + "/";
         boolean containsDifference = false;

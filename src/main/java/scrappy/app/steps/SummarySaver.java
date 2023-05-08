@@ -55,7 +55,7 @@ public class SummarySaver {
     }
 
     private String createSummaryDescription(String browseUrl, Issue issue, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
-        if (issue.getState() != IssueState.InUse) { return ""; }
+        if (issue.getState() == IssueState.Done) { return ""; }
 
         if (issue.hasSubIssues()) {
             List<String> items = new ArrayList<>();

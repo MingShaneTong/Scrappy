@@ -47,9 +47,10 @@ public class JiraIssues {
         String summary = fields.getString("summary");
         String stateString = fields
             .getJSONObject("status")
-            .getString("name");
+            .getJSONObject("statusCategory")
+            .getString("key");
         IssueState state = IssueStateParser.tryParse(stateString);
-        if (state != IssueState.InUse) {
+        if (state == IssueState.Done) {
             throw new RuntimeException("Execution jira not in use");
         }
 
@@ -109,7 +110,7 @@ public class JiraIssues {
             .getJSONObject("status")
             .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
-        if (state != IssueState.InUse) {
+        if (state == IssueState.Done) {
             return null;
         }
 
@@ -146,7 +147,7 @@ public class JiraIssues {
             .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
         String url = fields.getString(URLFIELD);
-        if (state != IssueState.InUse) {
+        if (state == IssueState.Done) {
             return null;
         }
 
