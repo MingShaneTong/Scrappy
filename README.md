@@ -1,8 +1,8 @@
-[Scrapper Jira Web Scrapper Banner](/docs/images/banner.png)
+![Scrapper Jira Web Scrapper Banner](/docs/images/banner.png)
 
 # Scrappy Jira Web Scrapper
-[Top Language Java](https://img.shields.io/github/languages/top/MingShaneTong/ScrappyJiraWebScrapper)
-[Downloads](https://img.shields.io/github/downloads/MingShaneTong/ScrappyJiraWebScrapper/total)
+![Top Language Java](https://img.shields.io/github/languages/top/MingShaneTong/ScrappyJiraWebScrapper)
+![Downloads](https://img.shields.io/github/downloads/MingShaneTong/ScrappyJiraWebScrapper/total)
 
 ## Introduction
 Scrappy is a Web Scraping tool that uses Jira as its primary Jira Integrated Tool made to store snapshot of a website's data. 
