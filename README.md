@@ -33,3 +33,10 @@ ${API Token}
 ${Execution Jira Issue Key} Eg. SCRAP-1
 ```
 5. To run the program, use the command `mvn compile exec:java`
+
+## Documentation
+
+[Creating an Execution Tree](docs/creating-an-execution-tree.md)
+[Custom Jira Issues](docs/jira-issue.md)
+[Adding Instructions](docs/adding-instructions.md)
+[Instructions Syntax](docs/syntax.md)
