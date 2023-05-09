@@ -21,17 +21,17 @@ public class IssueStateParser {
 
     /**
      * Parses the string to issue state
-     * @param state State string to parse
+     * @param key State key to parse
      * @return Parsed IssueState or null if not a type
      */
-    public static IssueState parse(String state) {
-        switch (state) {
-            case "In Use":
-                return IssueState.InUse;
-            case "To Be Used":
-                return IssueState.ToBeUsed;
-            case "Not In Use":
-                return IssueState.NotInUse;
+    public static IssueState parse(String key) {
+        switch (key) {
+            case "new":
+                return IssueState.New;
+            case "indeterminate":
+                return IssueState.Indeterminate;
+            case "done":
+                return IssueState.Done;
             default:
                 throw new RuntimeException("Issue State Not Supported.");
         }

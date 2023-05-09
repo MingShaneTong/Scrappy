@@ -14,16 +14,24 @@
             <version>1.31.0</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mashape.unirest</groupId>
+            <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
-            <version>1.4.9</version>
+            <version>3.14.2</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>scrappy.app.App</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

@@ -1,10 +1,10 @@
 package scrappy.jira;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONObject;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONObject;
 
 import java.io.File;
 
@@ -63,6 +63,18 @@ public class JiraApi {
                 .basicAuth(api.login(), api.apiToken())
                 .header("X-Atlassian-Token", "no-check")
                 .field("file", file)
+                .asJson();
+            return response.getBody().getObject();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static JSONObject getIssueMetadata(JiraApiProps api, String project, String issueType) {
+        String url = api.apiUrl().metadataUrl(project, issueType);
+        try {
+            HttpResponse<JsonNode> response = Unirest.get(url)
+                .basicAuth(api.login(), api.apiToken())
                 .asJson();
             return response.getBody().getObject();
         } catch (UnirestException e) {

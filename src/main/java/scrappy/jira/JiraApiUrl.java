@@ -47,4 +47,9 @@ public record JiraApiUrl(String url) {
     public String attachmentUrl(String issueKey) {
         return issueUrl(issueKey) + "/attachments";
     }
+
+    public String metadataUrl(String project, String issueType)
+    {
+        return url + "/rest/api/3/issue/createmeta?projectKeys=" + project +"&issuetypeNames=" + issueType.replace(" ", "%20") + "&expand=projects.issuetypes.fields";
+    }
 }

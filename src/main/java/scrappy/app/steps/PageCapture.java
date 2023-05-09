@@ -24,7 +24,7 @@ public class PageCapture {
      * @param location location in file directory
      */
     public void capturePages(ScrappyPage page, Issue issue, String location) {
-        if (issue.getState() != IssueState.InUse) { return; }
+        if (issue.getState() == IssueState.Done) { return; }
 
         String nextLocation = location + issue.getKey() + "/";
         if (issue.hasSubIssues()) {

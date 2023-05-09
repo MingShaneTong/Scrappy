@@ -64,21 +64,21 @@ public class DescriptionBuilder {
     }
 
     public static String createDeleteTextAdf(String content) {
-        if (content.isEmpty()) {
+        if (content.isBlank()) {
             return createHardBreakAdf();
         }
         return String.format(deleteAdf, content.replace("\"", "\\\""));
     }
 
     public static String createInsertTextAdf(String content) {
-        if (content.isEmpty()) {
+        if (content.isBlank()) {
             return createHardBreakAdf();
         }
         return String.format(insertAdf, content.replace("\"", "\\\""));
     }
 
     public static String createPlainTextAdf(String content) {
-        if (content.isEmpty()) {
+        if (content.isBlank()) {
             return createHardBreakAdf();
         }
         return String.format(plaintextAdf, content.replace("\"", "\\\""));

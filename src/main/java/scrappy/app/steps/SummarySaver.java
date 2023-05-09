@@ -1,7 +1,7 @@
 package scrappy.app.steps;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import scrappy.core.issue.builder.SummaryDescriptionBuilder;
 import scrappy.core.issue.builder.SummaryIssueBuilder;
 import scrappy.core.issue.types.Issue;
@@ -55,7 +55,7 @@ public class SummarySaver {
     }
 
     private String createSummaryDescription(String browseUrl, Issue issue, Map<Issue, Boolean> diffMap, Map<Issue, String> snapshotTicketsMap) {
-        if (issue.getState() != IssueState.InUse) { return ""; }
+        if (issue.getState() == IssueState.Done) { return ""; }
 
         if (issue.hasSubIssues()) {
             List<String> items = new ArrayList<>();

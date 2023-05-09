@@ -30,7 +30,7 @@ public class DiffDetector {
     }
 
     private boolean detectDifferences(Issue issue, String location, Map<Issue, Boolean> diffMap) {
-        if (issue.getState() != IssueState.InUse) { return false; }
+        if (issue.getState() == IssueState.Done) { return false; }
 
         String nextLocation = location + issue.getKey() + "/";
         boolean containsDifference = false;
@@ -53,7 +53,7 @@ public class DiffDetector {
             String archiveStr = Files.exists(archive) ? Files.readString(archive) : "";
             String artifactsStr = Files.exists(artifacts) ? Files.readString(artifacts) : "";
 
-            DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffDelimiter.WORD);
+            DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffDelimiter.LINE);
             List<DiffMatch.Diff> diffs = diffMatch.findDiffs(archiveStr, artifactsStr);
             String diffString = diffToAdf(diffs);
 

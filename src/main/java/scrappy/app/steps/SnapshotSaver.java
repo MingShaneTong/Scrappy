@@ -1,7 +1,7 @@
 package scrappy.app.steps;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import scrappy.app.AppLocations;
 import scrappy.core.issue.builder.SnapshotIssueBuilder;
 import scrappy.core.issue.types.Issue;
@@ -35,7 +35,7 @@ public class SnapshotSaver {
      * @param snapshotTicketsMap Stores UrlIssue to newly created SnapshotIssue
      */
     public void SaveIssues(JiraApiProps api, String project, Issue issue, String location, Map<Issue, String> snapshotTicketsMap) {
-        if (issue.getState() != IssueState.InUse) { return; }
+        if (issue.getState() == IssueState.Done) { return; }
 
         String nextLocation = location + issue.getKey() + "/" ;
         if (issue.hasSubIssues()) {

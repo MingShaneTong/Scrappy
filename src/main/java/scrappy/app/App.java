@@ -13,6 +13,9 @@ import scrappy.jira.JiraIssues;
 import scrappy.web.ScrappyPage;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +71,8 @@ public class App {
 
         // get jira data
         System.out.println("Collecting Jira Data...");
-        ExecutionIssue exe = JiraIssues.getExecution(api, executionJira);
+        JiraIssues issues = new JiraIssues(api, this.project);
+        ExecutionIssue exe = issues.getExecution(executionJira);
 
         // use previous current as new archive
         System.out.println("Resetting artifacts...");
@@ -104,14 +108,16 @@ public class App {
 
     /**
      * Starts application
-     * @param args [baseUrl, projectCode, username, apiToken, Execution jira key]
+     * @param args
      */
-    public static void main(String[] args) {
-        String url = args[0];
-        String project = args[1];
-        String login = args[2];
-        String apiToken = args[3];
-        String executionJira = args[4];
+    public static void main(String[] args) throws IOException {
+        String[] settings = Files.readAllLines(Path.of(".settings")).toArray(new String[0]);
+
+        String url = settings[0];
+        String project = settings[1];
+        String login = settings[2];
+        String apiToken = settings[3];
+        String executionJira = settings[4];
 
         App app = new App(url, project, login, apiToken, executionJira);
         app.start();
