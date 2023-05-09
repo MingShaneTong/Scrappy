@@ -71,7 +71,8 @@ public class App {
 
         // get jira data
         System.out.println("Collecting Jira Data...");
-        ExecutionIssue exe = JiraIssues.getExecution(api, executionJira);
+        JiraIssues issues = new JiraIssues(api, this.project);
+        ExecutionIssue exe = issues.getExecution(executionJira);
 
         // use previous current as new archive
         System.out.println("Resetting artifacts...");

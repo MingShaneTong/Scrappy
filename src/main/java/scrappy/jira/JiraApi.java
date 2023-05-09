@@ -69,4 +69,16 @@ public class JiraApi {
             throw new RuntimeException(e);
         }
     }
+
+    public static JSONObject getIssueMetadata(JiraApiProps api, String project, String issueType) {
+        String url = api.apiUrl().metadataUrl(project, issueType);
+        try {
+            HttpResponse<JsonNode> response = Unirest.get(url)
+                .basicAuth(api.login(), api.apiToken())
+                .asJson();
+            return response.getBody().getObject();
+        } catch (UnirestException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

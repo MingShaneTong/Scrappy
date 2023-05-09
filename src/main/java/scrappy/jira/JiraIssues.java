@@ -6,8 +6,7 @@ import scrappy.core.issue.parser.IssueStateParser;
 import scrappy.core.issue.parser.IssueTypeParser;
 import scrappy.core.issue.types.*;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,8 +16,6 @@ import java.util.stream.Stream;
  */
 public class JiraIssues {
     private static final String CONTAINS = "Contains";
-    private static final String URLFIELD = "customfield_10035";
-    private static final String INSTRUCTIONFIELD = "customfield_10036";
 
     private static Stream<JSONObject> jsonArrayToStream(JSONArray array) {
         return IntStream
@@ -26,14 +23,38 @@ public class JiraIssues {
             .mapToObj(array::getJSONObject);
     }
 
+    private final JiraApiProps apiProps;
+    private String urlField;
+    private String instructionField;
+
+    public JiraIssues(JiraApiProps apiProps, String project) {
+        this.apiProps = apiProps;
+
+        JSONObject json = JiraApi.getIssueMetadata(apiProps, project, "Scrappy Url");
+        JSONObject fields = json
+            .getJSONArray("projects")
+            .getJSONObject(0)
+            .getJSONArray("issuetypes")
+            .getJSONObject(0)
+            .getJSONObject("fields");
+
+        for (String key: fields.keySet()) {
+            String name = fields.getJSONObject(key).getString("name");
+            if (name.equals("URL")) {
+                urlField = key;
+            } else if (name.equals("Instructions")) {
+                instructionField = key;
+            }
+        }
+    }
+
     /**
      * Returns Execution issue and its sub-issues.
-     * @param api Jira REST Api Properties
      * @param issueKey Issue to retrieve
      * @return Execution Issue Object
      */
-    public static ExecutionIssue getExecution(JiraApiProps api, String issueKey) {
-        JSONObject json = JiraApi.getIssue(api, issueKey);
+    public ExecutionIssue getExecution(String issueKey) {
+        JSONObject json = JiraApi.getIssue(apiProps, issueKey);
         JSONObject fields = json.getJSONObject("fields");
         String issueTypeString = fields
             .getJSONObject("issuetype")
@@ -64,7 +85,7 @@ public class JiraIssues {
             }).map(subIssue -> {
                 String subIssueKey = subIssue.getJSONObject("outwardIssue")
                     .getString("key");
-                return JiraIssues.getSubIssue(api, subIssueKey);
+                return getSubIssue(subIssueKey);
             }).filter(Objects::nonNull)
             .collect(Collectors.toList());
 
@@ -73,12 +94,11 @@ public class JiraIssues {
 
     /**
      * Returns folder or url issue
-     * @param api Jira REST Api Properties
      * @param issueKey Issue to retrieve
      * @return Execution Issue Object
      */
-    public static Issue getSubIssue(JiraApiProps api, String issueKey) {
-        JSONObject json = JiraApi.getIssue(api, issueKey);
+    public Issue getSubIssue(String issueKey) {
+        JSONObject json = JiraApi.getIssue(apiProps, issueKey);
         JSONObject fields = json.getJSONObject("fields");
         String issueTypeString = fields
             .getJSONObject("issuetype")
@@ -86,7 +106,7 @@ public class JiraIssues {
         IssueType type = IssueTypeParser.tryParse(issueTypeString);
         switch (type) {
             case Folder:
-                return getFolderIssue(json, api, issueKey);
+                return getFolderIssue(json, issueKey);
             case Url:
                 return getUrlIssue(json, issueKey);
             case Execution:
@@ -98,11 +118,10 @@ public class JiraIssues {
     /**
      * Returns folder issue and its sub-issues.
      * @param json json object to parse
-     * @param api Jira REST Api Properties
      * @param issueKey Issue to retrieve
      * @return Execution Issue Object
      */
-    private static FolderIssue getFolderIssue(JSONObject json, JiraApiProps api, String issueKey) {
+    private FolderIssue getFolderIssue(JSONObject json, String issueKey) {
         // collect field
         JSONObject fields = json.getJSONObject("fields");
         String summary = fields.getString("summary");
@@ -125,7 +144,7 @@ public class JiraIssues {
             }).map(subIssue -> {
                 String subIssueKey = subIssue.getJSONObject("outwardIssue")
                     .getString("key");
-                return JiraIssues.getSubIssue(api, subIssueKey);
+                return getSubIssue(subIssueKey);
             }).filter(Objects::nonNull)
             .collect(Collectors.toList());
 
@@ -138,7 +157,7 @@ public class JiraIssues {
      * @param issueKey Issue to retrieve
      * @return Execution Issue Object
      */
-    private static UrlIssue getUrlIssue(JSONObject json, String issueKey) {
+    private UrlIssue getUrlIssue(JSONObject json, String issueKey) {
         // collect field
         JSONObject fields = json.getJSONObject("fields");
         String summary = fields.getString("summary");
@@ -146,15 +165,15 @@ public class JiraIssues {
             .getJSONObject("status")
             .getString("name");
         IssueState state = IssueStateParser.tryParse(stateString);
-        String url = fields.getString(URLFIELD);
+        String url = fields.getString(urlField);
         if (state == IssueState.Done) {
             return null;
         }
 
         String instructions = "";
-        if (fields.has(INSTRUCTIONFIELD) && !fields.isNull(INSTRUCTIONFIELD)) {
+        if (fields.has(instructionField) && !fields.isNull(instructionField)) {
             JSONArray instructionsArray = fields
-                .getJSONObject(INSTRUCTIONFIELD)
+                .getJSONObject(instructionField)
                 .getJSONArray("content");
             instructions = jsonArrayToStream(instructionsArray)
                 .filter(instrObj -> instrObj.getString("type").equals("codeBlock"))

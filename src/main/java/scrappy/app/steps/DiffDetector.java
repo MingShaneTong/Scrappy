@@ -53,7 +53,7 @@ public class DiffDetector {
             String archiveStr = Files.exists(archive) ? Files.readString(archive) : "";
             String artifactsStr = Files.exists(artifacts) ? Files.readString(artifacts) : "";
 
-            DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffDelimiter.WORD);
+            DiffMatch diffMatch = new DiffMatch(DiffMatch.DiffDelimiter.LINE);
             List<DiffMatch.Diff> diffs = diffMatch.findDiffs(archiveStr, artifactsStr);
             String diffString = diffToAdf(diffs);
 
