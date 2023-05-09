@@ -36,7 +36,7 @@ ${Execution Jira Issue Key} Eg. SCRAP-1
 
 ## Documentation
 
-[Creating an Execution Tree](docs/creating-an-execution-tree.md)
-[Custom Jira Issues](docs/jira-issue.md)
-[Adding Instructions](docs/adding-instructions.md)
-[Instructions Syntax](docs/syntax.md)
+- [Creating an Execution Tree](docs/creating-an-execution-tree.md)
+- [Custom Jira Issues](docs/jira-issue.md)
+- [Adding Instructions](docs/adding-instructions.md)
+- [Instructions Syntax](docs/syntax.md)
